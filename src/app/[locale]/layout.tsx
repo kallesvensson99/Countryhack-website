@@ -26,6 +26,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
 
   const [messages, t, user, org] = await Promise.all([getMessages(), getTranslations("nav"), getCurrentUser(), getOrgSettings()]);
   const isAdmin = user?.tags.includes("ADMIN");
+  const isLeader = user?.tags.includes("FESTIVALLEDARE");
 
   return (
     <html lang={locale}>
@@ -38,10 +39,12 @@ export default async function LocaleLayout({ children, params }: { children: Rea
             <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
               <Link href="/" className="text-lg font-bold">CCSS LAN</Link>
               <nav aria-label={t("main")} className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                <Link href="/events" className="hover:underline">{t("events")}</Link>
                 {user ? (
                   <>
                     <Link href="/my" className="hover:underline">{t("myPages")}</Link>
                     <Link href="/profile" className="hover:underline">{t("profile")}</Link>
+                    {isLeader && <Link href="/manage/events" className="hover:underline">{t("manageEvents")}</Link>}
                     {isAdmin && <Link href="/admin/users" className="hover:underline">{t("admin")}</Link>}
                     <form action={logoutAction}>
                       <button type="submit" className="hover:underline">{t("logout")}</button>

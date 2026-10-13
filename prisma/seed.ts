@@ -53,7 +53,45 @@ async function main() {
       await db.userTag.upsert({ where: { userId_tag: { userId: user.id, tag } }, update: {}, create: { userId: user.id, tag } });
     }
   }
+  await seedExampleEvent();
   console.log(`Seeded ${users.length} users (password: ${SEED_PASSWORD}).`);
+}
+
+/** One published example event (later stages add chart, food and discount code to it). */
+async function seedExampleEvent() {
+  const slug = "ccss-lan-hostlan";
+  if (await db.event.findUnique({ where: { slug } })) return;
+  const leader = await db.user.findUniqueOrThrow({ where: { email: "leader@ccss.test" } });
+  const day = 24 * 3600_000;
+  const start = new Date(Date.now() + 60 * day);
+  start.setUTCHours(16, 0, 0, 0); // ≈ 18:00 Swedish time
+  const hours = (n: number) => new Date(start.getTime() + n * 3600_000);
+  await db.event.create({
+    data: {
+      slug,
+      name: "CCSS Höst-LAN",
+      description: "Tre dagar med spel, mat och gemenskap!\nMedtag egen dator, headset och sovsäck.",
+      venueName: "Folkets Hus",
+      address: "Storgatan 1, 123 45 Exempelstad",
+      startsAt: start,
+      endsAt: hours(48),
+      registrationOpensAt: new Date(Date.now() - 7 * day),
+      registrationClosesAt: hours(-24),
+      seatChangeDeadline: hours(-12),
+      minAge: 14,
+      status: "PUBLISHED",
+      showNicknamesOnMap: true,
+      createdById: leader.id,
+      ticketTypes: {
+        create: [
+          { name: "Standard med plats", description: "Helhelg med plats vid långbord.", priceOre: 15000, quantity: 80, includesSeat: true, sortOrder: 1 },
+          { name: "VIP-plats", description: "Plats i VIP-zonen med extra utrymme.", priceOre: 25000, quantity: 10, includesSeat: true, sortOrder: 2 },
+          { name: "Besökare / utan plats", description: "Kom och hälsa på, utan egen plats.", priceOre: 5000, quantity: 30, includesSeat: false, sortOrder: 3 },
+          { name: "Crew", description: "För funktionärer.", priceOre: 0, quantity: 15, includesSeat: true, hidden: true, requiresDiscountCode: true, sortOrder: 4 },
+        ],
+      },
+    },
+  });
 }
 
 main()

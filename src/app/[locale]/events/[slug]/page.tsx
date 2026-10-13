@@ -1,0 +1,102 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { getEventForViewer, saleState, soldByType } from "@/lib/events/queries";
+import { can } from "@/lib/permissions";
+import { formatSek } from "@/lib/money";
+import { Link } from "@/i18n/navigation";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const event = await getEventForViewer(slug, await getCurrentUser());
+  return { title: event?.name ?? "Event" };
+}
+
+export default async function EventPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+  const user = await getCurrentUser();
+  const event = await getEventForViewer(slug, user);
+  if (!event) notFound();
+
+  const t = await getTranslations("events");
+  const tTickets = await getTranslations("tickets");
+  const f = await getFormatter();
+  const sold = await soldByType(event.id);
+  const isStaff = can(user, "event:manage");
+  // Hidden ticket types never show publicly; Festivalledare see them (marked) to check their setup.
+  const types = event.ticketTypes.filter((tt) => !tt.hidden || isStaff);
+  const dt = (d: Date) => f.dateTime(d, { dateStyle: "long", timeStyle: "short" });
+
+  return (
+    <article className="space-y-8">
+      {event.status === "DRAFT" && <p role="note" className="rounded-md border border-amber-400 bg-amber-50 p-3">{t("draftNotice")}</p>}
+      {event.status === "CANCELLED" && <p role="note" className="rounded-md border border-red-400 bg-red-50 p-3">{t("cancelledNotice")}</p>}
+      {event.status === "CLOSED" && <p role="note" className="rounded-md border border-slate-400 bg-slate-100 p-3">{t("closedNotice")}</p>}
+
+      <header className="space-y-3">
+        <h1 className="text-3xl font-bold">{event.name}</h1>
+        {event.imagePath && (
+          // eslint-disable-next-line @next/next/no-img-element -- user-uploaded, already size-limited
+          <img src={event.imagePath} alt={t("imageAlt", { name: event.name })} className="max-h-96 w-full rounded-lg object-cover" />
+        )}
+        {isStaff && <Link href={`/manage/events/${event.id}`} className="link">{(await getTranslations("manage"))("edit")}</Link>}
+      </header>
+
+      <section aria-labelledby="when-h" className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <h2 id="when-h" className="font-semibold">{t("when")}</h2>
+          <p>{dt(event.startsAt)} – {dt(event.endsAt)}</p>
+        </div>
+        <div>
+          <h2 className="font-semibold">{t("where")}</h2>
+          <p>{event.venueName}, {event.address}</p>
+        </div>
+        <p className="text-sm text-slate-700 sm:col-span-2">
+          {t("minAgeInfo", { minAge: event.minAge })} {t("registration", { opens: dt(event.registrationOpensAt), closes: dt(event.registrationClosesAt) })}
+        </p>
+      </section>
+
+      <section aria-labelledby="about-h">
+        <h2 id="about-h" className="text-xl font-semibold">{t("about")}</h2>
+        <p className="mt-2 whitespace-pre-line">{event.description}</p>
+      </section>
+
+      <section aria-labelledby="tickets-h" className="space-y-3">
+        <h2 id="tickets-h" className="text-xl font-semibold">{t("ticketsTitle")}</h2>
+        {types.length === 0 ? (
+          <p className="text-slate-600">{t("noTickets")}</p>
+        ) : (
+          <ul className="space-y-3">
+            {types.map((tt) => {
+              const taken = sold.get(tt.id) ?? 0;
+              const state = saleState(tt, taken);
+              const left = Math.max(0, tt.quantity - taken);
+              return (
+                <li key={tt.id} className="card">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="text-lg font-semibold">
+                      {tt.name}
+                      {tt.hidden && <span className="ml-2 rounded bg-slate-200 px-2 py-0.5 text-xs">{tTickets("hiddenBadge")}</span>}
+                    </h3>
+                    <p className="text-lg font-bold">{formatSek(tt.priceOre, locale)}</p>
+                  </div>
+                  {tt.description && <p className="mt-1 text-slate-700">{tt.description}</p>}
+                  <p className="mt-2 text-sm text-slate-700">
+                    {tt.includesSeat ? t("seatIncluded") : t("noSeat")}
+                    {tt.requiresDiscountCode && ` · ${t("needsCode")}`}
+                    {" · "}
+                    {state === "upcoming" ? t("state_upcoming", { date: dt(tt.salesStartsAt!) }) : t(`state_${state}`)}
+                    {state === "open" && ` · ${t("left", { count: left })}`}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <p className="text-sm text-slate-600">{t("buyComingSoon")}</p>
+      </section>
+    </article>
+  );
+}

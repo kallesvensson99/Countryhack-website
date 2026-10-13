@@ -28,6 +28,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  experimental: { serverActions: { bodySizeLimit: "6mb" } }, // event image uploads (max 5 MB)
   serverExternalPackages: ["@node-rs/argon2"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

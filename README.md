@@ -2,7 +2,7 @@
 
 Web app for running LAN parties for **Cable connectors spelsällskap (CCSS)**: member accounts, events, ticket sales, seat booking on a visual chart, and food packages.
 
-> **Status: stage (a) of 5 done** — accounts, roles, GDPR, admin, schema. Events, seating, payments and check-in follow in stages (b)–(e).
+> **Status: stages (a) and (b) of 5 done** — accounts, roles, GDPR, admin, schema; events, image upload, status flow, duplication, public pages, ticket types. Seating, payments/food and check-in follow in stages (c)–(e).
 
 Stack: Next.js 15 (App Router) · TypeScript strict · PostgreSQL 16 + Prisma 6 · Zod · custom session auth (argon2id) · Tailwind · next-intl (`sv` default, `en`) · Vitest + Playwright.
 
@@ -31,10 +31,12 @@ All use the password **`Password123!`**.
 | Email | Role | Notes |
 |---|---|---|
 | `admin@ccss.test` | Admin | users, tags, org settings, audit log |
-| `leader@ccss.test` | Festivalledare | (event features arrive in stage b+) |
+| `leader@ccss.test` | Festivalledare | manage events at `/sv/manage/events` |
 | `member@ccss.test` | Member | adult, verified |
 | `minor@ccss.test` | Member, 15 years old | has guardian name + phone |
 | `unverified@ccss.test` | Member | email not verified (can't buy) |
+
+The seed also creates one published example event, **CCSS Höst-LAN** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). Chart, food and discount code are added to it in stages (c)–(d).
 
 `prisma/seed.ts` refuses to run when `NODE_ENV=production`.
 
@@ -59,6 +61,8 @@ npx playwright install chromium   # once
 ```
 
 Vitest **truncates every table** in `ccss_test` between tests — never point `TEST_DATABASE_URL` at a real database (the setup refuses names not ending in `_test`).
+
+Stage (b) adds: Stockholm⇄UTC time handling (DST gaps), event create/update/status flow (incl. concurrent transitions), full event duplication (zone remapping, nothing transactional copied), ticket types (zone ownership, sold-quantity guards), draft visibility, image upload (magic-byte sniffing, replace/delete, shared files).
 
 What's covered in stage (a): role × action permission matrix (162 cases), registration / verification / login / reset / rate limiting, the one-active-ticket-per-event index, the birth-year age rule, minors' guardian rule, admin tag rules (last-admin race), org-settings audit, GDPR export + anonymization, email outbox (retry, concurrency).
 

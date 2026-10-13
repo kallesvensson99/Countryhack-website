@@ -1,0 +1,15 @@
+# Automatic HTTPS (Let's Encrypt) for $SITE_DOMAIN. DNS A/AAAA must point at this server.
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Uploaded event images are served straight from the volume.
+	handle_path /uploads/* {
+		root * /srv/uploads
+		file_server
+	}
+
+	handle {
+		# Caddy overwrites X-Forwarded-For with the real client IP (used for rate limiting & audit).
+		reverse_proxy app:3000
+	}
+}

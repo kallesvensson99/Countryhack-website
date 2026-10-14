@@ -25,6 +25,7 @@ export default defineConfig({
       APP_SECRET: "e2e-secret-e2e-secret-e2e-secret-123456",
       NODE_ENV: "production",
       ALLOW_SEED: "1", // the seed refuses to run in production otherwise
+      PAYMENT_PROVIDER: "mock", // fake checkout page instead of Stripe (only works on localhost)
     },
   },
 });

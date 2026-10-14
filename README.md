@@ -2,7 +2,7 @@
 
 Web app for running LAN parties for **Cable connectors spelsällskap (CCSS)**: member accounts, events, ticket sales, seat booking on a visual chart, and food packages.
 
-> **Status: stages (a), (b) and (c) of 5 done** — accounts/roles/GDPR/admin; events, ticket types, images, duplication; seating chart editor, templates, seat booking map + list view, hold/claim/move logic. Payments & food (d) and check-in & dashboard (e) follow.
+> **Status: stages (a)–(d) of 5 done** — accounts/roles/GDPR/admin; events & ticket types; seating editor & booking; **cart, checkout, payments, food, discount codes, receipts, refunds, worker expiry**. Check-in & dashboard (e) remain.
 
 Stack: Next.js 15 (App Router) · TypeScript strict · PostgreSQL 16 + Prisma 6 · Zod · custom session auth (argon2id) · Tailwind · next-intl (`sv` default, `en`) · Vitest + Playwright.
 
@@ -36,19 +36,24 @@ All use the password **`Password123!`**.
 | `minor@ccss.test` | Member, 15 years old | has guardian name + phone |
 | `unverified@ccss.test` | Member | email not verified (can't buy) |
 
-The seed also creates one published example event, **CCSS Höst-LAN** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). It has a 60-seat chart (Standard + VIP zones, stage, entrance, kitchen, toilets), zone links on the ticket types, and a chart template. Food and the discount code arrive in stage (d).
+The seed also creates one published example event, **CCSS Höst-LAN** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). It has a 60-seat chart (Standard + VIP zones, stage, entrance, kitchen, toilets), zone links on the ticket types, and a chart template. It also has five meals, three food packages (Helhelg, Fredagsmiddag, Frukostpaket — each with Standard/Vegetarisk/Vegansk) and two discount codes: **`CREW`** (100 %, unlocks the hidden Crew ticket) and **`EARLY10`** (10 %).
 
 `prisma/seed.ts` refuses to run when `NODE_ENV=production`.
 
-### Stripe (arrives in stage d)
+### Payments
 
-Use test-mode keys in `.env` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and forward webhooks with the Stripe CLI:
+Two providers behind the `PaymentProvider` interface, chosen with `PAYMENT_PROVIDER`:
+
+- **`mock`** — a fake checkout page inside the app (`/dev/mock-pay`) with *Pay* / *Cancel* buttons. No account needed; it feeds the same webhook handler as Stripe. **Refuses to run unless `APP_URL` is localhost.** Used by the Playwright tests.
+- **`stripe`** (default) — Stripe Checkout in **test mode** for development. Put test keys in `.env` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and forward webhooks with the Stripe CLI:
 
 ```bash
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
 ```
 
-The CLI prints the `whsec_…` signing secret to put in `STRIPE_WEBHOOK_SECRET`.
+The CLI prints the `whsec_…` signing secret to put in `STRIPE_WEBHOOK_SECRET`. Test card: `4242 4242 4242 4242`, any future date, any CVC. Stripe's minimum charge is about 3 SEK; free orders (100 % codes) skip Stripe entirely.
+
+The webhook endpoint is `POST /api/webhooks/stripe` (signature-verified, idempotent via `WebhookEvent`). Events used: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`. In production create the endpoint in the Stripe dashboard with those events and copy its signing secret into `STRIPE_WEBHOOK_SECRET`.
 
 ## Tests
 
@@ -61,6 +66,8 @@ npx playwright install chromium   # once
 ```
 
 Vitest **truncates every table** in `ccss_test` between tests — never point `TEST_DATABASE_URL` at a real database (the setup refuses names not ending in `_test`).
+
+Stage (d) adds: pricing and exact discount allocation; checkout rules (age rule, windows, stock, one ticket per member, code unlocking, zones, food rules); stock / code-use / seat races under concurrency; idempotent webhooks (also 5 simultaneous deliveries); late payments (seat re-taken, seat lost, conflict); order expiry incl. retrying a failed session close; full / partial / failed refunds; Stripe signature verification (incl. replay protection) and the webhook route; QR signing; food and discount-code management; kitchen summary; receipts and confirmation emails.
 
 Stage (c) adds: 50-way concurrent claims on one seat (exactly 1 wins), expired-hold reclaim, one-seat-per-ticket, atomic moves, claim-vs-chart-save races, chart save rollback and claim protection, templates, the seat-map privacy guarantees (nicknames only when allowed, no personal data), and the editor operations.
 

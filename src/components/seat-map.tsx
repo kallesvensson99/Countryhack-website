@@ -12,15 +12,30 @@ type Viewer = "visitor" | "member";
 const MIN_K = 1;
 const MAX_K = 6;
 
-export function SeatMap({ data, viewer, ticketLabel }: { data: SeatMapData; viewer: Viewer; ticketLabel?: string }) {
+/** In checkout mode the buyer picks a seat for a ticket they're about to buy: nothing is saved here, the parent holds the choice. */
+export interface CheckoutPick {
+  /** Zones the chosen ticket type may use (null = all). */
+  allowedZoneIds: string[] | null;
+  value: string | null;
+  onChange: (seatId: string | null) => void;
+}
+
+export function SeatMap({ data: rawData, viewer, ticketLabel, checkout }: { data: SeatMapData; viewer: Viewer; ticketLabel?: string; checkout?: CheckoutPick }) {
   const t = useTranslations("seats");
   const tAll = useTranslations();
   const router = useRouter();
+  // In checkout mode "selectable" depends on the ticket type being bought, so it's recomputed here.
+  const data = useMemo<SeatMapData>(
+    () => (checkout ? { ...rawData, seats: rawData.seats.map((s) => ({ ...s, selectable: s.state === "free" && (!checkout.allowedZoneIds || checkout.allowedZoneIds.includes(s.zoneId)) })) } : rawData),
+    [rawData, checkout],
+  );
   const zoneById = useMemo(() => new Map(data.zones.map((z) => [z.id, z])), [data.zones]);
   const kindLabels = useMemo(() => Object.fromEntries(["TABLE", "STAGE", "ENTRANCE", "KITCHEN", "TOILET", "WALL", "LABEL"].map((k) => [k, t(`kind_${k}`)])), [t]);
 
   const [view, setView] = useState<"map" | "list">("map");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [localSelected, setLocalSelected] = useState<string | null>(null);
+  const selectedId = checkout ? checkout.value : localSelected;
+  const setSelectedId = (id: string | null) => (checkout ? checkout.onChange(id) : setLocalSelected(id));
   const [activeId, setActiveId] = useState<string | null>(null); // hovered / focused
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -122,7 +137,7 @@ export function SeatMap({ data, viewer, ticketLabel }: { data: SeatMapData; view
   };
   const infoSeat = seatsById.get(activeId ?? selectedId ?? "") ?? null;
   const selected = selectedId ? seatsById.get(selectedId) ?? null : null;
-  const canPick = !!data.pick;
+  const canPick = !!data.pick || !!checkout;
 
   const choose = (s: MapSeat) => {
     if (!s.selectable) return;
@@ -170,7 +185,7 @@ export function SeatMap({ data, viewer, ticketLabel }: { data: SeatMapData; view
       </div>
 
       <p className="text-sm text-slate-700">{t("summary", { free: freeCount, total: data.seats.length })}</p>
-      <PickNotice data={data} viewer={viewer} ticketLabel={ticketLabel} />
+      {!checkout && <PickNotice data={data} viewer={viewer} ticketLabel={ticketLabel} />}
 
       {view === "map" ? (
         <div className="space-y-2">
@@ -255,7 +270,21 @@ export function SeatMap({ data, viewer, ticketLabel }: { data: SeatMapData; view
         {infoSeat ? describe(infoSeat) : t("hint")}
       </p>
 
-      {canPick && (
+      {checkout && (
+        <div className="space-y-2 rounded-lg border border-brand-500 bg-brand-50 p-4" role="status">
+          {selected ? (
+            <>
+              <p className="font-semibold">{t("checkoutChosen", { seat: selected.label })}</p>
+              <p className="text-sm">{t("checkoutHold")}</p>
+              <button type="button" className="btn-secondary" onClick={() => checkout.onChange(null)}>{t("checkoutClear")}</button>
+            </>
+          ) : (
+            <p>{t("checkoutPick")}</p>
+          )}
+        </div>
+      )}
+
+      {data.pick && !checkout && (
         <div className="space-y-2 rounded-lg border border-brand-500 bg-brand-50 p-4">
           {selected ? (
             <>

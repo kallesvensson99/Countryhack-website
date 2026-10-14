@@ -64,12 +64,14 @@ async function seedExampleEvent() {
   const existing = await db.event.findUnique({ where: { slug }, include: { chart: true } });
   if (existing) {
     if (!existing.chart) await seedChart(existing.id);
+    await seedCommerce(existing.id);
     return;
   }
   const leader = await db.user.findUniqueOrThrow({ where: { email: "leader@ccss.test" } });
   const day = 24 * 3600_000;
   const start = new Date(Date.now() + 60 * day);
   start.setUTCHours(16, 0, 0, 0); // ≈ 18:00 Swedish time
+  while (start.getUTCDay() !== 5) start.setUTCDate(start.getUTCDate() + 1); // a Friday, so the meal names (Fredag…Söndag) fit
   const hours = (n: number) => new Date(start.getTime() + n * 3600_000);
   const event = await db.event.create({
     data: {
@@ -98,6 +100,7 @@ async function seedExampleEvent() {
     },
   });
   await seedChart(event.id);
+  await seedCommerce(event.id);
 }
 
 /** Two zones, 60 seats (5 standard rows of 10 + a VIP row of 10), stage, entrance, kitchen, toilets; plus a template. */
@@ -135,6 +138,32 @@ async function seedChart(eventId: string) {
 
   if (!(await db.seatingChart.findFirst({ where: { isTemplate: true, name: "Standardmall (60 platser)" } }))) {
     await db.$transaction((tx) => copyChart(tx, chart.id, { name: "Standardmall (60 platser)", eventId: null, isTemplate: true }));
+  }
+}
+
+/** Meals, three food packages with variants, and two discount codes (CREW unlocks the hidden Crew ticket). */
+async function seedCommerce(eventId: string) {
+  if ((await db.meal.count({ where: { eventId } })) === 0) {
+    const event = await db.event.findUniqueOrThrow({ where: { id: eventId } });
+    const at = (h: number) => new Date(event.startsAt.getTime() + h * 3600_000);
+    const mk = (name: string, h: number) => db.meal.create({ data: { eventId, name, servedAt: at(h) } });
+    const fri = await mk("Fredagsmiddag", 1);
+    const satB = await mk("Lördagsfrukost", 15);
+    const satL = await mk("Lördagslunch", 19);
+    const satD = await mk("Lördagsmiddag", 25);
+    const sunB = await mk("Söndagsfrukost", 39);
+    const variants = [{ name: "Standard", sortOrder: 0 }, { name: "Vegetarisk", sortOrder: 1 }, { name: "Vegansk", sortOrder: 2 }];
+    const deadline = new Date(event.startsAt.getTime() - 3 * 24 * 3600_000);
+    const pkg = (name: string, description: string, priceOre: number, quantity: number | null, sortOrder: number, meals: string[]) =>
+      db.foodPackage.create({ data: { eventId, name, description, priceOre, quantity, sortOrder, salesEndsAt: deadline, meals: { create: meals.map((mealId) => ({ mealId })) }, variants: { create: variants } } });
+    await pkg("Helhelg", "Alla måltider från fredagsmiddag till söndagsfrukost.", 45000, 60, 1, [fri.id, satB.id, satL.id, satD.id, sunB.id]);
+    await pkg("Fredagsmiddag", "Middag på fredagen.", 9000, null, 2, [fri.id]);
+    await pkg("Frukostpaket", "Frukost lördag och söndag.", 12000, null, 3, [satB.id, sunB.id]);
+  }
+  if ((await db.discountCode.count({ where: { eventId } })) === 0) {
+    const crew = await db.ticketType.findFirst({ where: { eventId, name: "Crew" } });
+    await db.discountCode.create({ data: { eventId, code: "CREW", kind: "PERCENT", value: 100, appliesTo: "ALL", maxUses: 15, ticketTypes: crew ? { create: [{ ticketTypeId: crew.id }] } : undefined } });
+    await db.discountCode.create({ data: { eventId, code: "EARLY10", kind: "PERCENT", value: 10, appliesTo: "ALL" } });
   }
 }
 

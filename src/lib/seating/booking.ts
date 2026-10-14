@@ -74,7 +74,9 @@ export async function getSeatMap(eventId: string, viewer: Actor | null, now: Dat
   }
 
   const seats: MapSeat[] = chart.seats.map((s) => {
-    const claim = s.claim && !(s.claim.status === "HELD" && s.claim.expiresAt && s.claim.expiresAt <= now) ? s.claim : null; // expired holds count as free
+    let claim = s.claim && !(s.claim.status === "HELD" && s.claim.expiresAt && s.claim.expiresAt <= now) ? s.claim : null; // expired holds count as free
+    // The viewer's own unpaid hold looks free to them: starting a new checkout replaces it, so they may pick it again.
+    if (claim && viewer && claim.status === "HELD" && claim.ticket.userId === viewer.id && claim.ticket.status === "PENDING") claim = null;
     let state: SeatState;
     if (claim && viewer && claim.ticket.userId === viewer.id) state = "mine";
     else if (claim) state = "taken";

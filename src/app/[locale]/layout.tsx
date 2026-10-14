@@ -35,7 +35,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           {(await getTranslations("common"))("skipToContent")}
         </a>
         <NextIntlClientProvider messages={messages}>
-          <header className="border-b border-slate-200 bg-white">
+          <header className="border-b border-slate-200 bg-white print:hidden">
             <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
               <Link href="/" className="text-lg font-bold">CCSS LAN</Link>
               <nav aria-label={t("main")} className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -63,7 +63,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           <main id="main" className="mx-auto max-w-5xl px-4 py-8">
             {children}
           </main>
-          <footer className="mx-auto max-w-5xl px-4 pb-10 text-sm text-slate-600">
+          <footer className="mx-auto max-w-5xl px-4 pb-10 text-sm text-slate-600 print:hidden">
             <p>
               {org.name}
               {org.orgNumber ? ` · ${org.orgNumber}` : ""}

@@ -2,6 +2,7 @@ import "dotenv/config";
 import { deleteOldRateLimits } from "@/lib/auth/rate-limit";
 import { deleteExpiredSessions } from "@/lib/auth/sessions";
 import { processOutbox } from "@/lib/email/outbox";
+import { releaseExpiredClaims } from "@/lib/seating/claims";
 import { db } from "@/lib/db";
 
 /**
@@ -13,8 +14,9 @@ export async function tick(): Promise<void> {
   const mail = await processOutbox();
   const sessions = await deleteExpiredSessions();
   const limits = await deleteOldRateLimits();
-  if (mail.sent || mail.failed || sessions || limits) {
-    console.log(`[worker] emails sent=${mail.sent} failed=${mail.failed} sessionsPurged=${sessions} rateLimitRowsPurged=${limits}`);
+  const holds = await releaseExpiredClaims();
+  if (mail.sent || mail.failed || sessions || limits || holds) {
+    console.log(`[worker] emails sent=${mail.sent} failed=${mail.failed} sessionsPurged=${sessions} rateLimitRowsPurged=${limits} holdsReleased=${holds}`);
   }
 }
 

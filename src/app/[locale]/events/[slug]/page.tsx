@@ -6,6 +6,8 @@ import { getEventForViewer, saleState, soldByType } from "@/lib/events/queries";
 import { can } from "@/lib/permissions";
 import { formatSek } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
+import { SeatMap } from "@/components/seat-map";
+import { getSeatMap } from "@/lib/seating/booking";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -24,6 +26,7 @@ export default async function EventPage({ params }: { params: Promise<{ locale: 
   const tTickets = await getTranslations("tickets");
   const f = await getFormatter();
   const sold = await soldByType(event.id);
+  const seatMap = event.chart ? await getSeatMap(event.id, user) : null;
   const isStaff = can(user, "event:manage");
   // Hidden ticket types never show publicly; Festivalledare see them (marked) to check their setup.
   const types = event.ticketTypes.filter((tt) => !tt.hidden || isStaff);
@@ -97,6 +100,8 @@ export default async function EventPage({ params }: { params: Promise<{ locale: 
         )}
         <p className="text-sm text-slate-600">{t("buyComingSoon")}</p>
       </section>
+
+      {seatMap && <SeatMap data={seatMap} viewer={user ? "member" : "visitor"} />}
     </article>
   );
 }

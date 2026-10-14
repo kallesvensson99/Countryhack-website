@@ -2,7 +2,7 @@
 
 Web app for running LAN parties for **Cable connectors spelsällskap (CCSS)**: member accounts, events, ticket sales, seat booking on a visual chart, and food packages.
 
-> **Status: stages (a) and (b) of 5 done** — accounts, roles, GDPR, admin, schema; events, image upload, status flow, duplication, public pages, ticket types. Seating, payments/food and check-in follow in stages (c)–(e).
+> **Status: stages (a), (b) and (c) of 5 done** — accounts/roles/GDPR/admin; events, ticket types, images, duplication; seating chart editor, templates, seat booking map + list view, hold/claim/move logic. Payments & food (d) and check-in & dashboard (e) follow.
 
 Stack: Next.js 15 (App Router) · TypeScript strict · PostgreSQL 16 + Prisma 6 · Zod · custom session auth (argon2id) · Tailwind · next-intl (`sv` default, `en`) · Vitest + Playwright.
 
@@ -36,7 +36,7 @@ All use the password **`Password123!`**.
 | `minor@ccss.test` | Member, 15 years old | has guardian name + phone |
 | `unverified@ccss.test` | Member | email not verified (can't buy) |
 
-The seed also creates one published example event, **CCSS Höst-LAN** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). Chart, food and discount code are added to it in stages (c)–(d).
+The seed also creates one published example event, **CCSS Höst-LAN** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). It has a 60-seat chart (Standard + VIP zones, stage, entrance, kitchen, toilets), zone links on the ticket types, and a chart template. Food and the discount code arrive in stage (d).
 
 `prisma/seed.ts` refuses to run when `NODE_ENV=production`.
 
@@ -61,6 +61,8 @@ npx playwright install chromium   # once
 ```
 
 Vitest **truncates every table** in `ccss_test` between tests — never point `TEST_DATABASE_URL` at a real database (the setup refuses names not ending in `_test`).
+
+Stage (c) adds: 50-way concurrent claims on one seat (exactly 1 wins), expired-hold reclaim, one-seat-per-ticket, atomic moves, claim-vs-chart-save races, chart save rollback and claim protection, templates, the seat-map privacy guarantees (nicknames only when allowed, no personal data), and the editor operations.
 
 Stage (b) adds: Stockholm⇄UTC time handling (DST gaps), event create/update/status flow (incl. concurrent transitions), full event duplication (zone remapping, nothing transactional copied), ticket types (zone ownership, sold-quantity guards), draft visibility, image upload (magic-byte sniffing, replace/delete, shared files).
 

@@ -1,5 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { resetRateLimits } from "./helpers";
+test.beforeEach(resetRateLimits);
+
 const PASSWORD = "Password123!";
 // 1×1 transparent PNG
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==", "base64");

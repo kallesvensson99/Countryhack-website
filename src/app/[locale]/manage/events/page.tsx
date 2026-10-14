@@ -15,7 +15,10 @@ export default async function ManageEventsPage({ params }: { params: Promise<{ l
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <Link href="/manage/events/new" className="btn">{t("newEvent")}</Link>
+        <div className="flex gap-2">
+          <Link href="/manage/templates" className="btn-secondary">{t("templatesLink")}</Link>
+          <Link href="/manage/events/new" className="btn">{t("newEvent")}</Link>
+        </div>
       </div>
       {events.length === 0 ? (
         <p className="text-slate-600">{t("noEvents")}</p>

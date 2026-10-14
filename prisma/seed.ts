@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/auth/password";
+import { copyChart } from "../src/lib/seating/copy";
 
 const db = new PrismaClient();
 
@@ -60,13 +61,17 @@ async function main() {
 /** One published example event (later stages add chart, food and discount code to it). */
 async function seedExampleEvent() {
   const slug = "ccss-lan-hostlan";
-  if (await db.event.findUnique({ where: { slug } })) return;
+  const existing = await db.event.findUnique({ where: { slug }, include: { chart: true } });
+  if (existing) {
+    if (!existing.chart) await seedChart(existing.id);
+    return;
+  }
   const leader = await db.user.findUniqueOrThrow({ where: { email: "leader@ccss.test" } });
   const day = 24 * 3600_000;
   const start = new Date(Date.now() + 60 * day);
   start.setUTCHours(16, 0, 0, 0); // ≈ 18:00 Swedish time
   const hours = (n: number) => new Date(start.getTime() + n * 3600_000);
-  await db.event.create({
+  const event = await db.event.create({
     data: {
       slug,
       name: "CCSS Höst-LAN",
@@ -92,6 +97,45 @@ async function seedExampleEvent() {
       },
     },
   });
+  await seedChart(event.id);
+}
+
+/** Two zones, 60 seats (5 standard rows of 10 + a VIP row of 10), stage, entrance, kitchen, toilets; plus a template. */
+async function seedChart(eventId: string) {
+  const chart = await db.seatingChart.create({ data: { eventId, name: "Folkets Hus – stora salen", width: 1200, height: 800, gridSize: 20 } });
+  const standard = await db.seatZone.create({ data: { chartId: chart.id, name: "Standard", color: "#0072B2" } });
+  const vip = await db.seatZone.create({ data: { chartId: chart.id, name: "VIP", color: "#E69F00" } });
+
+  const seats: { chartId: string; label: string; x: number; y: number; zoneId: string; groupId: string }[] = [];
+  for (const [r, row] of ["A", "B", "C", "D", "E"].entries()) {
+    for (let i = 1; i <= 10; i++) seats.push({ chartId: chart.id, label: `${row}${i}`, x: 300 + (i - 1) * 40, y: 240 + r * 40, zoneId: standard.id, groupId: `row-${row}` });
+  }
+  for (let i = 1; i <= 10; i++) seats.push({ chartId: chart.id, label: `V${i}`, x: 300 + (i - 1) * 40, y: 480, zoneId: vip.id, groupId: "row-V" });
+  await db.seat.createMany({ data: seats });
+
+  await db.chartObject.createMany({
+    data: [
+      { chartId: chart.id, kind: "STAGE", x: 240, y: 40, width: 400, height: 100, rotation: 0 },
+      { chartId: chart.id, kind: "ENTRANCE", x: 60, y: 680, width: 120, height: 40, rotation: 0 },
+      { chartId: chart.id, kind: "KITCHEN", x: 960, y: 40, width: 180, height: 120, rotation: 0 },
+      { chartId: chart.id, kind: "TOILET", x: 1000, y: 280, width: 80, height: 60, rotation: 0, label: "WC 1" },
+      { chartId: chart.id, kind: "TOILET", x: 1000, y: 360, width: 80, height: 60, rotation: 0, label: "WC 2" },
+    ],
+  });
+
+  // Seat-bearing ticket types may use the matching zones; Crew may sit anywhere; Besökare has no seat.
+  const types = await db.ticketType.findMany({ where: { eventId } });
+  const link = async (name: string, zones: string[]) => {
+    const tt = types.find((t) => t.name === name);
+    if (tt) await db.ticketTypeZone.createMany({ data: zones.map((zoneId) => ({ ticketTypeId: tt.id, zoneId })), skipDuplicates: true });
+  };
+  await link("Standard med plats", [standard.id]);
+  await link("VIP-plats", [vip.id]);
+  await link("Crew", [standard.id, vip.id]);
+
+  if (!(await db.seatingChart.findFirst({ where: { isTemplate: true, name: "Standardmall (60 platser)" } }))) {
+    await db.$transaction((tx) => copyChart(tx, chart.id, { name: "Standardmall (60 platser)", eventId: null, isTemplate: true }));
+  }
 }
 
 main()

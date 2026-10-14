@@ -2,6 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 
 const db = new PrismaClient({ datasourceUrl: process.env.TEST_DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/ccss_test" });
+import { resetRateLimits } from "./helpers";
+test.beforeEach(resetRateLimits);
 test.afterAll(() => db.$disconnect());
 
 const PASSWORD = "Password123!";

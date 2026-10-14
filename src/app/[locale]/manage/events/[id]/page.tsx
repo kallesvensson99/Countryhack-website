@@ -29,6 +29,7 @@ export default async function ManageEventPage({ params }: { params: Promise<{ lo
       <nav className="flex flex-wrap gap-4 text-sm" aria-label={event.name}>
         <Link href={`/events/${event.slug}`} className="link">{t("viewPublic")}</Link>
         <Link href={`/manage/events/${event.id}/tickets`} className="link">{t("ticketsLink")}</Link>
+        <Link href={`/manage/events/${event.id}/chart`} className="link">{t("chartLink")}</Link>
       </nav>
 
       <section className="card space-y-3" aria-labelledby="status-h">

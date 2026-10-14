@@ -46,4 +46,5 @@ export const LIMITS = {
   verifyResendUser: { limit: 3, windowSeconds: 3600 },
   verifyResendIp: { limit: 10, windowSeconds: 3600 },
   checkout: { limit: 30, windowSeconds: 3600 },
+  broadcast: { limit: 5, windowSeconds: 3600 },
 } as const;

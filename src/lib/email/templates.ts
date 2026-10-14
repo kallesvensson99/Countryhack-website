@@ -22,7 +22,7 @@ export interface ConfirmationPayload {
 export interface TemplatePayloads {
   "verify-email": { name: string; url: string };
   "reset-password": { name: string; url: string };
-  broadcast: { subject: string; body: string };
+  broadcast: { subject: string; body: string; eventName?: string };
   "order-confirmation": ConfirmationPayload;
   "order-cancelled": { name: string; orderNumber: string; eventName: string; refundedOre: number; url: string };
   "seat-needed": { name: string; eventName: string; url: string };
@@ -99,11 +99,15 @@ const renderers: { [K in TemplateName]: Renderer<K> } = {
     const t = l === "sv" ? { subject: "Välj en ny plats", line: `Din betalning för ${p.eventName} kom in, men platsen du valde hann bli upptagen. Din biljett är giltig – välj en ny plats på eventets sida.`, cta: "Välj plats" } : { subject: "Please choose a new seat", line: `Your payment for ${p.eventName} went through, but the seat you picked was taken in the meantime. Your ticket is valid – please choose a new seat on the event page.`, cta: "Choose seat" };
     return { subject: t.subject, html: layout(l, `<h2>${esc(p.name)}</h2><p>${esc(t.line)}</p>${button(p.url, t.cta)}`), text: `${t.line}\n\n${p.url}` };
   },
-  broadcast: (p, l) => ({
-    subject: p.subject,
-    html: layout(l, `<h2>${esc(p.subject)}</h2>${esc(p.body).replace(/\n/g, "<br>")}`),
-    text: p.body,
-  }),
+  broadcast: (p, l) => {
+    // Why they get this mail (they didn't ask for it, so say so)
+    const why = p.eventName ? (l === "sv" ? `Du får det här meddelandet för att du har en biljett till ${p.eventName}.` : `You are receiving this message because you have a ticket to ${p.eventName}.`) : "";
+    return {
+      subject: p.subject,
+      html: layout(l, `<h2>${esc(p.subject)}</h2>${esc(p.body).replace(/\n/g, "<br>")}${why ? `<p style="margin-top:24px;font-size:12px;color:#666">${esc(why)}</p>` : ""}`),
+      text: why ? `${p.body}\n\n--\n${why}` : p.body,
+    };
+  },
 };
 
 export function renderTemplate<K extends TemplateName>(name: K, locale: Locale, payload: TemplatePayloads[K]): Rendered {

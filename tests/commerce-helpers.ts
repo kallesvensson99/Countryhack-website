@@ -103,3 +103,19 @@ export async function shop() {
 }
 
 export type Shop = Awaited<ReturnType<typeof shop>>;
+
+import { startCheckout } from "@/lib/orders/checkout";
+import { handleProviderEvent } from "@/lib/orders/webhooks";
+
+/** A member who buys through the real checkout and whose payment webhook arrives: ACTIVE ticket, confirmed seat/food. */
+export async function buyPaid(s: Shop, over: Parameters<Shop["input"]>[0] = {}, opts: Parameters<Shop["buyer"]>[0] & { allergies?: string | null; realName?: string } = {}) {
+  const { allergies, realName, ...userOpts } = opts;
+  const b = await s.buyer(userOpts);
+  if (allergies !== undefined || realName) await db.user.update({ where: { id: b.user.id }, data: { ...(allergies !== undefined ? { allergies } : {}), ...(realName ? { realName } : {}) } });
+  const r = await startCheckout(b.actor, s.input(over));
+  if (!r.ok) throw new Error(`checkout failed: ${r.reason}`);
+  const order = await db.order.findUniqueOrThrow({ where: { number: r.orderNumber } });
+  await handleProviderEvent("fake", { type: "checkout.paid", id: `evt_${order.id}`, orderId: order.id, sessionId: `cs_${order.id}`, paymentRef: `pi_${order.id}`, amountOre: order.totalOre });
+  const ticket = await db.ticket.findFirstOrThrow({ where: { userId: b.user.id, eventId: s.event.id } });
+  return { ...b, order, ticket };
+}

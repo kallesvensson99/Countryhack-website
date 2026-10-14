@@ -55,6 +55,16 @@ The CLI prints the `whsec_…` signing secret to put in `STRIPE_WEBHOOK_SECRET`.
 
 The webhook endpoint is `POST /api/webhooks/stripe` (signature-verified, idempotent via `WebhookEvent`). Events used: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`. In production create the endpoint in the Stripe dashboard with those events and copy its signing secret into `STRIPE_WEBHOOK_SECRET`.
 
+## Public pages
+
+| Page | Content |
+|---|---|
+| **Landing page** `/sv` | The next published event that hasn't ended (a running event still counts): hero with dates, venue and registration status, facts (age limit, free seats), the **public ticket types** with price and availability (hidden types such as Crew are never shown), how it works, and links to the FAQ and crew page. Other upcoming events are listed below. Includes schema.org `Event` structured data. |
+| **FAQ** `/sv/faq` | Accessible accordion (`<details>`) in four groups, `FAQPage` structured data. Answers use the live age limit of the next event and the contact address from **Admin → Inställningar**. |
+| **Crew** `/sv/crew` | Why join, five jobs (check-in, kitchen, tech, hosts, set-up/take-down) with when help is needed, and how to apply: a ready-made email (`mailto:` with subject and a template body) to the contact address. Crew then get a code that unlocks the hidden free *Crew* ticket (see the seeded `CREW` code). |
+
+The wording is in `messages/sv.json` and `messages/en.json` (`home`, `faq`, `crew`); the FAQ's structure is `src/lib/content/faq.ts`; the crew jobs are the `ROLES` list in `src/app/[locale]/crew/page.tsx`. **Set a contact email under Admin → Inställningar** — without it the crew page shows a "contact details not added yet" note instead of the apply button. A test keeps the Swedish and English message files in sync.
+
 ## Event day
 
 Festivalledare find everything under **Hantera event → (event)**:

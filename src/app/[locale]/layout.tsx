@@ -40,6 +40,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
               <Link href="/" className="text-lg font-bold">CCSS LAN</Link>
               <nav aria-label={t("main")} className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                 <Link href="/events" className="hover:underline">{t("events")}</Link>
+                <Link href="/faq" className="hover:underline">{t("faq")}</Link>
+                <Link href="/crew" className="hover:underline">{t("crew")}</Link>
                 {user ? (
                   <>
                     <Link href="/my" className="hover:underline">{t("myPages")}</Link>

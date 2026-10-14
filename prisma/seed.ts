@@ -29,7 +29,8 @@ async function main() {
   if (process.env.NODE_ENV === "production" && !process.env.ALLOW_SEED) throw new Error("Refusing to seed test users in production.");
 
   const settings = (await db.orgSettings.findFirst()) ?? (await db.orgSettings.create({ data: {} }));
-  void settings;
+  // a contact address so the FAQ and crew pages have something to show in development
+  if (!settings.contactEmail) await db.orgSettings.update({ where: { id: settings.id }, data: { contactEmail: "info@ccss.test" } });
 
   const passwordHash = await hashPassword(SEED_PASSWORD);
   for (const u of users) {

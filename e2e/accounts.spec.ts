@@ -19,7 +19,7 @@ async function login(page: Page, email: string, password = PASSWORD, expectSucce
 test("visitor sees Swedish UI by default, can switch to English, and reads the privacy policy", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/sv$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("LAN-party");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Höst-LAN"); // the landing page features the next event
   await page.getByRole("link", { name: "EN", exact: true }).click();
   await expect(page).toHaveURL(/\/en$/);
   await page.getByRole("link", { name: "Privacy policy" }).click();

@@ -11,6 +11,7 @@ const schema = z.object({
   SMTP_HOST: z.string().default("localhost"),
   SMTP_PORT: z.coerce.number().int().default(1025),
   RESEND_API_KEY: z.string().optional(),
+  PAYMENT_PROVIDER: z.enum(["stripe", "mock"]).default("stripe"),
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_WEBHOOK_SECRET: z.string().optional(),
   UPLOAD_DIR: z.string().default("./uploads"),

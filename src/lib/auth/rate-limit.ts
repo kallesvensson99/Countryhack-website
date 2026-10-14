@@ -45,4 +45,5 @@ export const LIMITS = {
   resetEmail: { limit: 3, windowSeconds: 3600 },
   verifyResendUser: { limit: 3, windowSeconds: 3600 },
   verifyResendIp: { limit: 10, windowSeconds: 3600 },
+  checkout: { limit: 30, windowSeconds: 3600 },
 } as const;

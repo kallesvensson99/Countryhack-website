@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "../db";
 import { getEmailSender } from "./sender";
+import { qrPng } from "../tickets/qr";
 import { renderTemplate, type Locale, type TemplateName, type TemplatePayloads } from "./templates";
 
 type Client = Prisma.TransactionClient | typeof db;
@@ -38,7 +39,8 @@ export async function processOutbox(batch = 20): Promise<{ sent: number; failed:
       const mail = await tx.emailOutbox.findUniqueOrThrow({ where: { id } });
       try {
         const r = renderTemplate(mail.template as TemplateName, mail.locale as Locale, mail.payload as never);
-        await sender.send({ to: mail.to, subject: r.subject, html: r.html, text: r.text });
+        const attachments = await Promise.all((r.attachments ?? []).map(async (a) => ({ filename: a.filename, cid: a.cid, content: await qrPng(a.qr), contentType: "image/png" })));
+        await sender.send({ to: mail.to, subject: r.subject, html: r.html, text: r.text, attachments });
         await tx.emailOutbox.update({ where: { id }, data: { status: "SENT", sentAt: new Date(), attempts: { increment: 1 }, error: null } });
         return "sent" as const;
       } catch (err) {

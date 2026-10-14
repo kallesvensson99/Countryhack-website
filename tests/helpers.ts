@@ -10,6 +10,7 @@ export async function resetDb() {
     SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename <> '_prisma_migrations'`;
   const list = tables.map((t) => `"${t.tablename}"`).join(", ");
   await db.$executeRawUnsafe(`TRUNCATE ${list} RESTART IDENTITY CASCADE`);
+  await db.$executeRawUnsafe(`ALTER SEQUENCE "order_number_seq" RESTART WITH 1`);
   await db.orgSettings.create({ data: {} });
 }
 

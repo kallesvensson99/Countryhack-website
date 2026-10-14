@@ -3,20 +3,22 @@ import { deleteOldRateLimits } from "@/lib/auth/rate-limit";
 import { deleteExpiredSessions } from "@/lib/auth/sessions";
 import { processOutbox } from "@/lib/email/outbox";
 import { releaseExpiredClaims } from "@/lib/seating/claims";
+import { expireDueOrders } from "@/lib/orders/expire";
 import { db } from "@/lib/db";
 
 /**
  * Runs every minute (same image as the app, different command: `npm run worker`).
  * Stage (a): send queued emails, purge expired sessions / old rate-limit rows.
- * Stage (d) adds: expire unpaid orders, release seat holds, close Stripe sessions.
+ * Also expires unpaid orders (releasing ticket, food and seat hold) and closes their payment-provider sessions.
  */
 export async function tick(): Promise<void> {
   const mail = await processOutbox();
   const sessions = await deleteExpiredSessions();
   const limits = await deleteOldRateLimits();
-  const holds = await releaseExpiredClaims();
-  if (mail.sent || mail.failed || sessions || limits || holds) {
-    console.log(`[worker] emails sent=${mail.sent} failed=${mail.failed} sessionsPurged=${sessions} rateLimitRowsPurged=${limits} holdsReleased=${holds}`);
+  const orders = await expireDueOrders(); // also releases the seat holds and closes provider sessions of expired orders
+  const holds = await releaseExpiredClaims(); // safety net for stray expired holds
+  if (mail.sent || mail.failed || sessions || limits || holds || orders.expired || orders.sessionsClosed) {
+    console.log(`[worker] emails sent=${mail.sent} failed=${mail.failed} sessionsPurged=${sessions} rateLimitRowsPurged=${limits} holdsReleased=${holds} ordersExpired=${orders.expired} sessionsClosed=${orders.sessionsClosed}`);
   }
 }
 

@@ -8,3 +8,4 @@ next-env.d.ts
 /uploads
 test-results
 playwright-report
+e2e/.tmp

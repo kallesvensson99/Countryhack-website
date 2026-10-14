@@ -2,7 +2,7 @@
 
 Web app for running LAN parties for **Cable connectors spelsällskap (CCSS)**: member accounts, events, ticket sales, seat booking on a visual chart, and food packages.
 
-> **Status: stages (a)–(d) of 5 done** — accounts/roles/GDPR/admin; events & ticket types; seating editor & booking; **cart, checkout, payments, food, discount codes, receipts, refunds, worker expiry**. Check-in & dashboard (e) remain.
+> **Status: all five stages done** — accounts/roles/GDPR/admin · events & ticket types · seating editor & booking · cart, payments, food, receipts, refunds · **check-in, meal collection, statistics, attendee list + CSV, email to attendees**.
 
 Stack: Next.js 15 (App Router) · TypeScript strict · PostgreSQL 16 + Prisma 6 · Zod · custom session auth (argon2id) · Tailwind · next-intl (`sv` default, `en`) · Vitest + Playwright.
 
@@ -55,17 +55,36 @@ The CLI prints the `whsec_…` signing secret to put in `STRIPE_WEBHOOK_SECRET`.
 
 The webhook endpoint is `POST /api/webhooks/stripe` (signature-verified, idempotent via `WebhookEvent`). Events used: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.expired`. In production create the endpoint in the Stripe dashboard with those events and copy its signing secret into `STRIPE_WEBHOOK_SECRET`.
 
+## Event day
+
+Festivalledare find everything under **Hantera event → (event)**:
+
+| Page | What it does |
+|---|---|
+| **Incheckning** (`/manage/events/<id>/checkin`) | Mobile-first door tool. Scan the ticket QR with the camera (`@zxing/browser`), *or* search by name / nickname / order number, *or* paste a ticket code (hand scanners that "type" the code work too). The card shows name, ticket, seat, **allergies**, **guardian name + phone for under-18s**, food with per-meal *Hämta* buttons, and one big *Checka in* button. A second check-in warns "redan incheckad" and shows who/when. Online only. |
+| **Deltagare** | Attendee list with search and filters (ticket type, checked in, has food, minors), guardian details, and CSV export. |
+| **Statistik** | Tickets per type, seat occupancy per zone, revenue (received − refunded), food per package/variant, checked-in count. |
+| **Mejla deltagare** | Subject + message to everyone with a paid ticket (confirm step, rate-limited, logged in `Broadcast`). |
+
+Notes:
+
+- **The camera needs HTTPS** (or `localhost`). In production Caddy provides that. Without a camera, search always works.
+- **CSV** is UTF-8 with a BOM. The default uses **semicolons**, because Excel with Swedish regional settings treats `;` as the list separator (a comma-separated file would land in one column); a comma variant is offered too. Cells that start with `=`, `+`, `-` or `@` are neutralised against spreadsheet formula injection. Each export is written to the audit log because it contains personal data.
+- Ticket QR tokens are `ccss1.<ticketId>.<nonce>.<HMAC>` signed with `APP_SECRET`; changing a ticket's `qrNonce` invalidates old printouts.
+
 ## Tests
 
 ```bash
 npm run typecheck
 npm run lint
 npm test            # Vitest, real Postgres: database `ccss_test` (migrations applied automatically)
-npm run test:e2e    # Playwright: builds the app, seeds ccss_test, runs desktop + mobile (Chromium)
+npm run test:e2e    # Playwright: builds the app, seeds ccss_test, runs desktop + mobile + "scanner" (Chromium)
 npx playwright install chromium   # once
 ```
 
 Vitest **truncates every table** in `ccss_test` between tests — never point `TEST_DATABASE_URL` at a real database (the setup refuses names not ending in `_test`).
+
+Stage (e) adds: check-in (signed/tampered/foreign/rotated-nonce codes, search, 8 crew members racing for one ticket → exactly one wins, undo, minors by actual birth date incl. the 18th-birthday boundary, per-meal collection), statistics (incl. partial refunds), attendee filters, CSV (BOM, delimiters, quoting, formula neutralisation, route authorisation + audit), broadcast (recipients, outbox, language, rate limit). End-to-end in a browser, including **scanning a real ticket QR through a fake webcam** (Chromium plays a generated video of the QR).
 
 Stage (d) adds: pricing and exact discount allocation; checkout rules (age rule, windows, stock, one ticket per member, code unlocking, zones, food rules); stock / code-use / seat races under concurrency; idempotent webhooks (also 5 simultaneous deliveries); late payments (seat re-taken, seat lost, conflict); order expiry incl. retrying a failed session close; full / partial / failed refunds; Stripe signature verification (incl. replay protection) and the webhook route; QR signing; food and discount-code management; kitchen summary; receipts and confirmation emails.
 

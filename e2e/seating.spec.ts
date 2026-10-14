@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { PrismaClient } from "@prisma/client";
 
 const db = new PrismaClient({ datasourceUrl: process.env.TEST_DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/ccss_test" });
-import { resetRateLimits } from "./helpers";
+import { resetRateLimits, wipeAttendee } from "./helpers";
 test.beforeEach(resetRateLimits);
 test.afterAll(() => db.$disconnect());
 
@@ -21,11 +21,8 @@ const seat = (page: Page, label: string) => page.locator(`svg [role="button"][ar
 
 /** Gives `email` an ACTIVE ticket of the given type for the seeded event, replacing any earlier test data. */
 async function giveTicket(email: string, typeName: string) {
-  const event = await db.event.findUniqueOrThrow({ where: { slug: SLUG } });
-  const user = await db.user.findUniqueOrThrow({ where: { email } });
+  const { user, event } = await wipeAttendee(email); // other specs leave orders / food behind
   const type = await db.ticketType.findFirstOrThrow({ where: { eventId: event.id, name: typeName } });
-  await db.seatClaim.deleteMany({ where: { ticket: { userId: user.id, eventId: event.id } } });
-  await db.ticket.deleteMany({ where: { userId: user.id, eventId: event.id } });
   const order = await db.order.create({ data: { number: `E2E-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, userId: user.id, eventId: event.id, status: "PAID", subtotalOre: 0, totalOre: 0, expiresAt: new Date(), paidAt: new Date() } });
   return db.ticket.create({ data: { eventId: event.id, userId: user.id, ticketTypeId: type.id, orderId: order.id, status: "ACTIVE", qrNonce: "e2e" } });
 }

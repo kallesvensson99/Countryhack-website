@@ -34,6 +34,10 @@ export default async function ManageEventPage({ params }: { params: Promise<{ lo
         <Link href={`/manage/events/${event.id}/codes`} className="link">{t("codesLink")}</Link>
         <Link href={`/manage/events/${event.id}/orders`} className="link">{t("ordersLink")}</Link>
         <Link href={`/manage/events/${event.id}/kitchen`} className="link">{t("kitchenLink")}</Link>
+        <Link href={`/manage/events/${event.id}/checkin`} className="link font-semibold">{t("checkinLink")}</Link>
+        <Link href={`/manage/events/${event.id}/attendees`} className="link">{t("attendeesLink")}</Link>
+        <Link href={`/manage/events/${event.id}/stats`} className="link">{t("statsLink")}</Link>
+        <Link href={`/manage/events/${event.id}/broadcast`} className="link">{t("broadcastLink")}</Link>
       </nav>
 
       <section className="card space-y-3" aria-labelledby="status-h">

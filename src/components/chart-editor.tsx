@@ -310,7 +310,7 @@ export function ChartEditor({ chartId, initial, isTemplate }: { chartId: string;
                   }}
                   style={{ cursor: "move", outline: "none" }}
                 >
-                  <ObjectShape o={{ ...o, x: p.x, y: p.y }} kindLabels={kindLabels} selected={sel.has(key)} />
+                  <ObjectShape o={{ ...o, x: p.x, y: p.y }} kindLabels={kindLabels} selected={sel.has(key)} tone="light" />
                 </g>
               );
             })}

@@ -28,37 +28,41 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
+    <div className="space-y-14">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(ld) }} />
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="text-lg text-slate-700">{t("lead")}</p>
-        <nav aria-label={t("jump")} className="flex flex-wrap gap-x-4 gap-y-1 pt-2 text-sm">
+      <header className="space-y-3">
+        <p aria-hidden className="eyebrow text-barn">man countryhack</p>
+        <h1 className="disp text-5xl sm:text-7xl">{t("title")}</h1>
+        <p className="max-w-xl text-xl text-slate-700">{t("lead")}</p>
+        <nav aria-label={t("jump")} className="flex flex-wrap gap-3 pt-3">
           {groups.map((g) => (
-            <a key={g.id} href={`#faq-${g.id}`} className="link">{t(`group_${g.id}`)}</a>
+            <a key={g.id} href={`#faq-${g.id}`} className="btn-secondary">{t(`group_${g.id}`)}</a>
           ))}
         </nav>
       </header>
 
-      {groups.map((g) => (
-        <section key={g.id} id={`faq-${g.id}`} aria-labelledby={`faq-${g.id}-h`} className="space-y-3 scroll-mt-4">
-          <h2 id={`faq-${g.id}-h`} className="text-xl font-semibold">{t(`group_${g.id}`)}</h2>
-          <div className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+      {groups.map((g, gi) => (
+        <section key={g.id} id={`faq-${g.id}`} aria-labelledby={`faq-${g.id}-h`} className="scroll-mt-4 grid items-start gap-6 md:grid-cols-[minmax(0,260px)_minmax(0,1fr)] md:gap-12">
+          <div>
+            <p aria-hidden className="font-mono text-base font-bold text-barn">0{gi + 1}</p>
+            <h2 id={`faq-${g.id}-h`} className="disp text-3xl sm:text-4xl">{t(`group_${g.id}`)}</h2>
+          </div>
+          <div className="space-y-4">
             {g.items.map((i) => (
-              <details key={i.id} id={`q-${i.id}`} className="group p-4">
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 font-medium">
+              <details key={i.id} id={`q-${i.id}`} className="group rounded-[10px] border-2 border-ink bg-card shadow-sticker">
+                <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 px-5 py-3 text-lg font-extrabold leading-snug [&::-webkit-details-marker]:hidden">
                   <span>{i.q}</span>
-                  <span aria-hidden className="text-xl text-slate-500 transition-transform group-open:rotate-45">+</span>
+                  <span aria-hidden className="flex h-9 w-9 flex-none items-center justify-center rounded-full border-2 border-ink bg-hay font-mono text-2xl font-bold leading-none group-open:before:content-['−'] before:content-['+']" />
                 </summary>
-                <p className="mt-2 whitespace-pre-line text-slate-700">{i.a}</p>
+                <p className="max-w-2xl whitespace-pre-line px-5 pb-5">{i.a}</p>
               </details>
             ))}
           </div>
         </section>
       ))}
 
-      <section aria-labelledby="faq-more-h" className="card space-y-2">
-        <h2 id="faq-more-h" className="text-lg font-semibold">{t("moreTitle")}</h2>
+      <section aria-labelledby="faq-more-h" className="card-hay space-y-3 !p-8">
+        <h2 id="faq-more-h" className="disp text-3xl">{t("moreTitle")}</h2>
         <p>
           {org.contactEmail ? (
             <>

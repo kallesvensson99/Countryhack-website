@@ -109,7 +109,7 @@ test.describe("buying", () => {
 
     // My pages
     await page.goto("/sv/my");
-    await expect(page.getByRole("img", { name: /QR-kod för din biljett till CCSS Höst-LAN/ })).toBeVisible();
+    await expect(page.getByRole("img", { name: /QR-kod för din biljett till Countryhack/ })).toBeVisible();
     await expect(page.getByText("Plats:").first()).toBeVisible();
     await expect(page.getByText("Fredagsmiddag – Standard")).toBeVisible();
 

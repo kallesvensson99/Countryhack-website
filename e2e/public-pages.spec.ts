@@ -6,7 +6,7 @@ const noHorizontalScroll = (page: import("@playwright/test").Page) => page.evalu
 test.describe("landing page", () => {
   test("features the next event with facts and its public tickets", async ({ page }) => {
     await page.goto("/sv");
-    await expect(page.getByRole("heading", { level: 1, name: "CCSS Höst-LAN" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Countryhack" })).toBeVisible();
     await expect(page.getByText("Nästa LAN")).toBeVisible();
     await expect(page.getByRole("link", { name: "Köp biljett" }).first()).toHaveAttribute("href", `/sv/events/${SLUG}`);
 
@@ -36,7 +36,7 @@ test.describe("landing page", () => {
     const raw = await page.locator('script[type="application/ld+json"]').first().textContent();
     const ld = JSON.parse(raw!);
     expect(ld["@type"]).toBe("Event");
-    expect(ld.name).toBe("CCSS Höst-LAN");
+    expect(ld.name).toBe("Countryhack");
     expect(ld.location.name).toBe("Folkets Hus");
     expect(ld.offers.map((o: { name: string }) => o.name)).toEqual(["Standard med plats", "VIP-plats", "Besökare / utan plats"]);
     expect(ld.offers[0]).toMatchObject({ price: "150.00", priceCurrency: "SEK" });
@@ -44,7 +44,7 @@ test.describe("landing page", () => {
 
   test("works in English too", async ({ page }) => {
     await page.goto("/en");
-    await expect(page.getByRole("heading", { level: 1, name: "CCSS Höst-LAN" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Countryhack" })).toBeVisible();
     await expect(page.getByText("Next LAN")).toBeVisible();
     await expect(page.getByRole("region", { name: "Event facts" })).toContainText("14 years");
     await expect(page.getByRole("region", { name: "Tickets" }).getByText("SEK 150")).toBeVisible();
@@ -72,7 +72,7 @@ test.describe("landing page", () => {
     await page.getByRole("button", { name: "Logga in" }).click();
     await expect(page).toHaveURL(/profile/);
     await page.goto("/sv");
-    await expect(page.getByRole("heading", { level: 1, name: "CCSS Höst-LAN" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Countryhack" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Skapa konto" })).toHaveCount(0);
   });
 });
@@ -137,7 +137,7 @@ test.describe("crew page", () => {
   test("lists the jobs and explains how to apply, with a ready-made email", async ({ page }) => {
     await page.goto("/sv/crew");
     await expect(page.getByRole("heading", { level: 1, name: "Bli crew" })).toBeVisible();
-    await expect(page.getByRole("note").first()).toContainText("CCSS Höst-LAN");
+    await expect(page.getByRole("note").first()).toContainText("Countryhack");
     const jobs = page.getByRole("region", { name: "Uppgifter vi behöver hjälp med" });
     for (const j of ["Incheckning och information", "Kök och mat", "Teknik och nätverk", "Värdar och trygghet", "Uppbyggnad och nedrivning"]) await expect(jobs.getByRole("heading", { name: j })).toBeVisible();
     await expect(jobs.getByText("Före").first()).toBeVisible();
@@ -147,7 +147,7 @@ test.describe("crew page", () => {
     const url = new URL(href);
     expect(url.protocol).toBe("mailto:");
     expect(url.pathname).toBe("info@ccss.test");
-    expect(url.searchParams.get("subject")).toBe("Crew: CCSS Höst-LAN");
+    expect(url.searchParams.get("subject")).toBe("Crew: Countryhack");
     expect(url.searchParams.get("body")).toContain("Uppgift jag är intresserad av:");
     await expect(page.getByText("Mejla oss på info@ccss.test")).toBeVisible();
     await expect(page.getByText("Har du inget konto än?")).toBeVisible();

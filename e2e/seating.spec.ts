@@ -238,12 +238,12 @@ test.describe("chart editor (Festivalledare)", () => {
     await page.getByLabel("Börja från").selectOption({ label: "Standardmall (60 platser) (60 platser)" });
     await page.getByRole("button", { name: "Skapa platskarta" }).click();
     await expect(page.locator('svg [data-key^="s:"]')).toHaveCount(60);
-    await expect(page.locator('svg [data-key^="o:"]')).toHaveCount(5);
+    await expect(page.locator('svg [data-key^="o:"]')).toHaveCount(35);
 
     // select everything with the keyboard, then clear it
     await page.locator('svg [data-key^="s:"]').first().focus();
     await page.keyboard.press("Control+a");
-    await expect(page.getByText("60 platser och 5 objekt markerade")).toBeVisible();
+    await expect(page.getByText("60 platser och 35 objekt markerade")).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(page.getByText("Inget markerat.")).toBeVisible();
   });

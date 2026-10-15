@@ -175,9 +175,9 @@ export function SeatMap({ data: rawData, viewer, ticketLabel, checkout }: { data
     <section aria-labelledby="seatmap-h" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="seatmap-h" className="text-xl font-semibold">{t("title")}</h2>
-        <div role="group" aria-label={t("viewSwitch")} className="inline-flex overflow-hidden rounded-md border border-slate-400">
+        <div role="group" aria-label={t("viewSwitch")} className="inline-flex overflow-hidden rounded-full border-2 border-ink">
           {(["map", "list"] as const).map((v) => (
-            <button key={v} type="button" onClick={() => setView(v)} aria-pressed={view === v} className={`min-h-11 px-4 text-sm font-semibold ${view === v ? "bg-brand-600 text-white" : "bg-white hover:bg-slate-100"}`}>
+            <button key={v} type="button" onClick={() => setView(v)} aria-pressed={view === v} className={`min-h-11 px-4 text-sm font-bold ${view === v ? "bg-hay text-ink" : "bg-card hover:bg-slate-100"}`}>
               {t(`view_${v}`)}
             </button>
           ))}
@@ -195,7 +195,7 @@ export function SeatMap({ data: rawData, viewer, ticketLabel, checkout }: { data
             <button type="button" className="btn-secondary" onClick={resetCam}>{t("zoomReset")}</button>
             <span className="text-sm text-slate-600" aria-hidden="true">{Math.round(cam.k * 100)}%</span>
           </div>
-          <div className="overflow-hidden rounded-lg border border-slate-300 bg-white">
+          <div className="overflow-hidden rounded-[10px] border-2 border-ink bg-night shadow-sticker-lg">
             <svg
               ref={svgRef}
               viewBox={viewBox}
@@ -209,7 +209,7 @@ export function SeatMap({ data: rawData, viewer, ticketLabel, checkout }: { data
               onPointerCancel={onPointerUp}
             >
               <SeatDefs />
-              <rect x={0} y={0} width={W} height={H} fill="#f8fafc" />
+              <rect x={0} y={0} width={W} height={H} fill="#0f2118" />
               {data.objects.map((o) => (
                 <ObjectShape key={o.id} o={o} kindLabels={kindLabels} />
               ))}

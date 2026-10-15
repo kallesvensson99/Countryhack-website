@@ -1,4 +1,4 @@
-# CCSS LAN
+# Countryhack
 
 Web app for running LAN parties for **Cable connectors spelsällskap (CCSS)**: member accounts, events, ticket sales, seat booking on a visual chart, and food packages.
 
@@ -36,7 +36,7 @@ All use the password **`Password123!`**.
 | `minor@ccss.test` | Member, 15 years old | has guardian name + phone |
 | `unverified@ccss.test` | Member | email not verified (can't buy) |
 
-The seed also creates one published example event, **CCSS Höst-LAN** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). It has a 60-seat chart (Standard + VIP zones, stage, entrance, kitchen, toilets), zone links on the ticket types, and a chart template. It also has five meals, three food packages (Helhelg, Fredagsmiddag, Frukostpaket — each with Standard/Vegetarisk/Vegansk) and two discount codes: **`CREW`** (100 %, unlocks the hidden Crew ticket) and **`EARLY10`** (10 %).
+The seed also creates one published example event, **Countryhack** (`/sv/events/ccss-lan-hostlan`), with four ticket types (Crew is hidden and needs a code). It has a 60-seat chart (30 tables of two, seats side by side; VIP row nearest the stage; stage, entrance, kitchen, toilets), zone links on the ticket types, and a chart template. It also has five meals, three food packages (Helhelg, Fredagsmiddag, Frukostpaket — each with Standard/Vegetarisk/Vegansk) and two discount codes: **`CREW`** (100 %, unlocks the hidden Crew ticket) and **`EARLY10`** (10 %).
 
 `prisma/seed.ts` refuses to run when `NODE_ENV=production`.
 

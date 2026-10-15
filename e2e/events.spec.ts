@@ -135,7 +135,7 @@ test("validation errors keep what was typed; plain members can't manage events",
 
 test("the seeded example event is public with its tickets", async ({ page }) => {
   await page.goto("/sv/events/ccss-lan-hostlan");
-  await expect(page.getByRole("heading", { level: 1, name: "CCSS Höst-LAN" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Countryhack" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Standard med plats" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "VIP-plats" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Besökare / utan plats" })).toBeVisible();

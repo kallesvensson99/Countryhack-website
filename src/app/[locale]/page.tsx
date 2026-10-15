@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { HeroScene } from "@/components/hero-scene";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getOrgSettings } from "@/lib/auth/service";
 import { getNextEvent, listUpcomingEvents, saleState, seatAvailability, soldByType } from "@/lib/events/queries";
@@ -14,7 +15,7 @@ const sameDay = (a: Date, b: Date) => JSON.stringify(stockholmParts(a)) === JSON
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "home" });
-  return { title: { absolute: "CCSS LAN" }, description: t("lead") };
+  return { title: { absolute: "Countryhack" }, description: t("lead") };
 }
 
 export default async function HomePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ deleted?: string }> }) {
@@ -65,90 +66,105 @@ export default async function HomePage({ params, searchParams }: { params: Promi
   };
 
   return (
-    <div className="space-y-12">
-      {deleted && <p role="status" className="rounded-md bg-green-50 p-3 text-green-900">{t("deleted")}</p>}
+    <div className="space-y-16">
+      {deleted && <p role="status" className="rounded-md border-2 border-ink bg-sage p-3 font-medium text-ink">{t("deleted")}</p>}
       {eventLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(eventLd) }} />}
 
       {next ? (
         <>
-          <section aria-labelledby="hero-h" className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            {next.imagePath && (
-              // eslint-disable-next-line @next/next/no-img-element -- user-uploaded, already size-limited
-              <img src={next.imagePath} alt="" className="h-56 w-full object-cover sm:h-72" />
-            )}
-            <div className="space-y-4 p-6 sm:p-8">
-              <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">{t("eyebrow")}</p>
-              <h1 id="hero-h" className="text-3xl font-bold sm:text-4xl">{next.name}</h1>
-              <p className="text-lg text-slate-700">
-                {day(next.startsAt)}
-                {!sameDay(next.startsAt, next.endsAt) && <> – {day(next.endsAt)}</>} · {next.venueName}
+          {/* Full-bleed night hero with the barn-and-antenna scene */}
+          <section aria-labelledby="hero-h" className="on-dark relative left-1/2 -mt-8 w-screen -translate-x-1/2 overflow-hidden bg-night text-paper">
+            <HeroScene />
+            <div className="relative mx-auto max-w-5xl px-4 pb-56 pt-12 sm:pb-64 sm:pt-16">
+              <p className="eyebrow mb-5 text-sage">
+                <span className="text-hay">$ </span>
+                {t("eyebrow")} <span className="caret" aria-hidden="true" />
               </p>
-              <p className="line-clamp-4 max-w-3xl whitespace-pre-line text-slate-700">{next.description}</p>
+              <h1 id="hero-h" className="disp max-w-3xl break-words text-6xl text-paper sm:text-8xl">{next.name}</h1>
+              <p className="mt-6 max-w-xl text-xl leading-snug sm:text-2xl">
+                {day(next.startsAt)}
+                {!sameDay(next.startsAt, next.endsAt) && <> – {day(next.endsAt)}</>}
+              </p>
+              <p className="mt-3 font-mono text-lg font-bold text-hay">{next.venueName}</p>
+              <p className="mt-6 line-clamp-3 max-w-xl text-paper/90">{next.description}</p>
               {registration && (
-                <p role="status" className={`inline-block rounded-md px-3 py-1 text-sm font-medium ${registration.key === "registrationOpen" ? "bg-green-100 text-green-900" : "bg-slate-100 text-slate-800"}`}>
+                <p role="status" className={`tag mt-6 normal-case ${registration.key === "registrationOpen" ? "!bg-sage" : ""}`}>
                   {registration.date ? t(registration.key, { when: when(registration.date) }) : t(registration.key)}
                 </p>
               )}
-              <div className="flex flex-wrap gap-3 pt-1">
-                <Link href={`/events/${next.slug}`} className="btn min-h-12 px-6 text-base">
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Link href={`/events/${next.slug}`} className="btn min-h-14 px-7 text-xl">
                   {registration?.key === "registrationOpen" ? t("heroCta") : t("moreAboutEvent")}
                 </Link>
-                {!user && <Link href="/register" className="btn-secondary min-h-12 px-6 text-base">{t("cta")}</Link>}
+                {!user && <Link href="/register" className="btn-ghost min-h-14 px-7 text-xl">{t("cta")}</Link>}
               </div>
             </div>
           </section>
 
-          <section aria-labelledby="facts-h">
+          {next.imagePath && (
+            // eslint-disable-next-line @next/next/no-img-element -- user-uploaded, already size-limited
+            <img src={next.imagePath} alt="" className="h-56 w-full rounded-[10px] border-2 border-ink object-cover shadow-sticker-lg sm:h-72" />
+          )}
+
+          <section aria-labelledby="facts-h" className="relative -mt-28">
             <h2 id="facts-h" className="sr-only">{t("factsTitle")}</h2>
-            <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <div className="card">
-                <dt className="text-sm text-slate-600">{t("factWhen")}</dt>
-                <dd className="font-semibold">{when(next.startsAt)}</dd>
+                <dt className="eyebrow text-slate-600">{t("factWhen")}</dt>
+                <dd className="mt-1 text-xl font-extrabold leading-tight">{when(next.startsAt)}</dd>
                 <dd className="text-sm text-slate-600">{t("until", { when: when(next.endsAt) })}</dd>
               </div>
               <div className="card">
-                <dt className="text-sm text-slate-600">{t("factWhere")}</dt>
-                <dd className="font-semibold">{next.venueName}</dd>
+                <dt className="eyebrow text-slate-600">{t("factWhere")}</dt>
+                <dd className="mt-1 text-xl font-extrabold leading-tight">{next.venueName}</dd>
                 <dd className="text-sm text-slate-600">{next.address}</dd>
               </div>
               <div className="card">
-                <dt className="text-sm text-slate-600">{t("factAge")}</dt>
-                <dd className="font-semibold">{t("ageValue", { minAge: next.minAge })}</dd>
+                <dt className="eyebrow text-slate-600">{t("factAge")}</dt>
+                <dd className="mt-1 text-xl font-extrabold leading-tight">{t("ageValue", { minAge: next.minAge })}</dd>
                 <dd className="text-sm text-slate-600">{t("ageNote")}</dd>
               </div>
               <div className="card">
-                <dt className="text-sm text-slate-600">{t("factSeats")}</dt>
-                <dd className="font-semibold">{seats ? t("seatsValue", { free: seats.free, total: seats.total }) : t("seatsNone")}</dd>
+                <dt className="eyebrow text-slate-600">{t("factSeats")}</dt>
+                <dd className="mt-1 text-xl font-extrabold leading-tight">{seats ? t("seatsValue", { free: seats.free, total: seats.total }) : t("seatsNone")}</dd>
                 <dd className="text-sm text-slate-600">{t("seatsNote")}</dd>
               </div>
             </dl>
           </section>
 
-          <section aria-labelledby="tickets-h" className="space-y-4">
-            <div className="flex flex-wrap items-end justify-between gap-2">
-              <h2 id="tickets-h" className="text-2xl font-bold">{t("ticketsTitle")}</h2>
-              <p className="text-sm text-slate-600">{t("ticketsLead")}</p>
+          <section aria-labelledby="tickets-h" className="space-y-6">
+            <div className="space-y-2">
+              <p aria-hidden className="eyebrow text-barn">01</p>
+              <h2 id="tickets-h" className="disp text-4xl sm:text-5xl">{t("ticketsTitle")}</h2>
+              <p className="max-w-xl text-slate-600">{t("ticketsLead")}</p>
             </div>
             {next.ticketTypes.length === 0 ? (
               <p className="text-slate-600">{t("noTickets")}</p>
             ) : (
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {next.ticketTypes.map((tt) => {
+              <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {next.ticketTypes.map((tt, idx) => {
                   const taken = sold.get(tt.id) ?? 0;
                   const state = saleState(tt, taken, now);
                   const left = Math.max(0, tt.quantity - taken);
+                  const on = tt.quantity > 0 ? Math.round((10 * left) / tt.quantity) : 0;
+                  const leftText = te("left", { count: left });
                   return (
-                    <li key={tt.id} className="card flex flex-col gap-2">
-                      <h3 className="text-lg font-semibold">{tt.name}</h3>
-                      <p className="text-3xl font-bold">{formatSek(tt.priceOre, locale)}</p>
-                      {tt.description && <p className="text-slate-700">{tt.description}</p>}
-                      <p className="mt-auto text-sm text-slate-700">
+                    <li key={tt.id} className={`${idx === 1 ? "card-hay" : "card"} flex flex-col gap-3 !p-7`}>
+                      <h3 className="text-2xl font-extrabold leading-tight">{tt.name}</h3>
+                      <p className="disp text-5xl">{formatSek(tt.priceOre, locale)}</p>
+                      {tt.description && <p>{tt.description}</p>}
+                      <p className="mt-auto font-mono text-sm font-bold">
                         {tt.includesSeat ? te("seatIncluded") : te("noSeat")}
                         {tt.requiresDiscountCode && ` · ${te("needsCode")}`}
                       </p>
-                      <p className={`text-sm font-medium ${state === "open" ? "text-green-800" : "text-slate-700"}`}>
+                      {state === "open" && (
+                        <div className={`meter ${on <= 2 ? "low" : ""}`} role="img" aria-label={leftText}>
+                          {Array.from({ length: 10 }, (_, i) => <i key={i} className={i < on ? "on" : ""} />)}
+                        </div>
+                      )}
+                      <p className="font-mono text-sm font-bold">
                         {state === "upcoming" ? te("state_upcoming", { date: when(tt.salesStartsAt!) }) : te(`state_${state}`)}
-                        {state === "open" && left <= 10 && ` · ${te("left", { count: left })}`}
+                        {state === "open" && left <= 10 && ` · ${leftText}`}
                       </p>
                       <Link href={`/events/${next.slug}`} className={state === "open" ? "btn" : "btn-secondary"} aria-label={`${state === "open" ? t("choose") : t("details")}: ${tt.name}`}>
                         {state === "open" ? t("choose") : t("details")}
@@ -161,47 +177,47 @@ export default async function HomePage({ params, searchParams }: { params: Promi
           </section>
         </>
       ) : (
-        <section aria-labelledby="hero-h" className="space-y-4 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 id="hero-h" className="text-3xl font-bold sm:text-4xl">{t("title")}</h1>
-          <p className="text-lg text-slate-700">{t("lead")}</p>
-          <p role="status" className="rounded-md bg-slate-100 p-3">{t("noEvents")}</p>
+        <section aria-labelledby="hero-h" className="on-dark -mt-2 space-y-4 rounded-[10px] border-2 border-paper bg-night p-8 text-paper shadow-sticker-hay">
+          <h1 id="hero-h" className="disp text-5xl sm:text-6xl">{t("title")}</h1>
+          <p className="text-lg">{t("lead")}</p>
+          <p role="status" className="rounded-md bg-night-2 p-3">{t("noEvents")}</p>
           {!user && <Link href="/register" className="btn">{t("cta")}</Link>}
         </section>
       )}
 
-      <section aria-labelledby="how-h" className="space-y-4">
-        <h2 id="how-h" className="text-2xl font-bold">{t("howTitle")}</h2>
-        <ol className="grid gap-4 sm:grid-cols-3">
+      <section aria-labelledby="how-h" className="space-y-6">
+        <h2 id="how-h" className="disp text-4xl sm:text-5xl">{t("howTitle")}</h2>
+        <ol className="grid gap-8 sm:grid-cols-3">
           {[1, 2, 3].map((n) => (
-            <li key={n} className="card">
-              <p aria-hidden className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 font-bold text-white">{n}</p>
-              <h3 className="font-semibold">{t(`step${n}Title`)}</h3>
-              <p className="text-slate-700">{t(`step${n}Body`)}</p>
+            <li key={n} className="border-t-4 border-ink pt-4">
+              <p aria-hidden className="mb-2 font-mono text-lg font-bold text-barn">0{n}</p>
+              <h3 className="text-2xl font-extrabold leading-tight">{t(`step${n}Title`)}</h3>
+              <p className="mt-2 text-slate-600">{t(`step${n}Body`)}</p>
             </li>
           ))}
         </ol>
       </section>
 
-      <section aria-label={t("moreTitle")} className="grid gap-4 sm:grid-cols-2">
-        <div className="card space-y-2">
-          <h2 className="text-xl font-semibold">{t("crewTitle")}</h2>
-          <p className="text-slate-700">{t("crewBody")}</p>
-          <Link href="/crew" className="btn-secondary">{t("crewCta")}</Link>
+      <section aria-label={t("moreTitle")} className="grid gap-8 sm:grid-cols-2">
+        <div className="card-hay flex flex-col gap-3 !p-8">
+          <h2 className="disp text-4xl">{t("crewTitle")}</h2>
+          <p className="text-lg">{t("crewBody")}</p>
+          <Link href="/crew" className="btn-secondary mt-auto self-start">{t("crewCta")}</Link>
         </div>
-        <div className="card space-y-2">
-          <h2 className="text-xl font-semibold">{t("faqTitle")}</h2>
-          <p className="text-slate-700">{t("faqBody")}</p>
-          <Link href="/faq" className="btn-secondary">{t("faqCta")}</Link>
+        <div className="card flex flex-col gap-3 !p-8">
+          <h2 className="disp text-4xl">{t("faqTitle")}</h2>
+          <p className="text-lg">{t("faqBody")}</p>
+          <Link href="/faq" className="btn mt-auto self-start">{t("faqCta")}</Link>
         </div>
       </section>
 
       {others.length > 0 && (
         <section aria-labelledby="others-h" className="space-y-3">
-          <h2 id="others-h" className="text-xl font-semibold">{t("others")}</h2>
+          <h2 id="others-h" className="disp text-3xl">{t("others")}</h2>
           <ul className="space-y-2">
             {others.map((e) => (
               <li key={e.id}>
-                <Link href={`/events/${e.slug}`} className="link text-lg">{e.name}</Link>
+                <Link href={`/events/${e.slug}`} className="link text-lg font-bold">{e.name}</Link>
                 <span className="text-slate-600"> · {day(e.startsAt)} · {e.venueName}</span>
               </li>
             ))}

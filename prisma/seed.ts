@@ -77,7 +77,7 @@ async function seedExampleEvent() {
   const event = await db.event.create({
     data: {
       slug,
-      name: "CCSS Höst-LAN",
+      name: "Countryhack",
       description: "Tre dagar med spel, mat och gemenskap!\nMedtag egen dator, headset och sovsäck.",
       venueName: "Folkets Hus",
       address: "Storgatan 1, 123 45 Exempelstad",
@@ -92,7 +92,7 @@ async function seedExampleEvent() {
       createdById: leader.id,
       ticketTypes: {
         create: [
-          { name: "Standard med plats", description: "Helhelg med plats vid långbord.", priceOre: 15000, quantity: 80, includesSeat: true, sortOrder: 1 },
+          { name: "Standard med plats", description: "Helhelg med plats vid ett bord för två.", priceOre: 15000, quantity: 80, includesSeat: true, sortOrder: 1 },
           { name: "VIP-plats", description: "Plats i VIP-zonen med extra utrymme.", priceOre: 25000, quantity: 10, includesSeat: true, sortOrder: 2 },
           { name: "Besökare / utan plats", description: "Kom och hälsa på, utan egen plats.", priceOre: 5000, quantity: 30, includesSeat: false, sortOrder: 3 },
           { name: "Crew", description: "För funktionärer.", priceOre: 0, quantity: 15, includesSeat: true, hidden: true, requiresDiscountCode: true, sortOrder: 4 },
@@ -104,23 +104,35 @@ async function seedExampleEvent() {
   await seedCommerce(event.id);
 }
 
-/** Two zones, 60 seats (5 standard rows of 10 + a VIP row of 10), stage, entrance, kitchen, toilets; plus a template. */
+/** Two zones, 60 seats at 30 tables of two (side by side on one long side; VIP row nearest the stage), stage, entrance, kitchen, toilets; plus a template. */
 async function seedChart(eventId: string) {
-  const chart = await db.seatingChart.create({ data: { eventId, name: "Folkets Hus – stora salen", width: 1200, height: 800, gridSize: 20 } });
-  const standard = await db.seatZone.create({ data: { chartId: chart.id, name: "Standard", color: "#0072B2" } });
-  const vip = await db.seatZone.create({ data: { chartId: chart.id, name: "VIP", color: "#E69F00" } });
+  const chart = await db.seatingChart.create({ data: { eventId, name: "Folkets Hus – stora salen", width: 1200, height: 900, gridSize: 20 } });
+  const standard = await db.seatZone.create({ data: { chartId: chart.id, name: "Standard", color: "#8FB59C" } });
+  const vip = await db.seatZone.create({ data: { chartId: chart.id, name: "VIP", color: "#E9B73A" } });
 
-  const seats: { chartId: string; label: string; x: number; y: number; zoneId: string; groupId: string }[] = [];
-  for (const [r, row] of ["A", "B", "C", "D", "E"].entries()) {
-    for (let i = 1; i <= 10; i++) seats.push({ chartId: chart.id, label: `${row}${i}`, x: 300 + (i - 1) * 40, y: 240 + r * 40, zoneId: standard.id, groupId: `row-${row}` });
+  // Rows of five tables. Each table has two seats side by side below it, facing it (rotation 180 = backrest down).
+  const rows: { prefix: string; zoneId: string; y: number }[] = [{ prefix: "V", zoneId: vip.id, y: 260 }];
+  for (const [r, prefix] of ["A", "B", "C", "D", "E"].entries()) rows.push({ prefix, zoneId: standard.id, y: 360 + r * 100 });
+  const seats: { chartId: string; label: string; x: number; y: number; rotation: number; zoneId: string; groupId: string }[] = [];
+  const tables: { chartId: string; kind: "TABLE"; x: number; y: number; width: number; height: number; rotation: number; label: string }[] = [];
+  let tableNo = 0;
+  for (const row of rows) {
+    for (let k = 0; k < 5; k++) {
+      tableNo++;
+      const x = 300 + k * 110;
+      tables.push({ chartId: chart.id, kind: "TABLE", x: x - 20, y: row.y - 52, width: 76, height: 30, rotation: 0, label: String(tableNo) });
+      for (let j = 0; j < 2; j++) {
+        seats.push({ chartId: chart.id, label: `${row.prefix}${k * 2 + j + 1}`, x: x + j * 36, y: row.y, rotation: 180, zoneId: row.zoneId, groupId: `table-${tableNo}` });
+      }
+    }
   }
-  for (let i = 1; i <= 10; i++) seats.push({ chartId: chart.id, label: `V${i}`, x: 300 + (i - 1) * 40, y: 480, zoneId: vip.id, groupId: "row-V" });
   await db.seat.createMany({ data: seats });
 
   await db.chartObject.createMany({
     data: [
+      ...tables,
       { chartId: chart.id, kind: "STAGE", x: 240, y: 40, width: 400, height: 100, rotation: 0 },
-      { chartId: chart.id, kind: "ENTRANCE", x: 60, y: 680, width: 120, height: 40, rotation: 0 },
+      { chartId: chart.id, kind: "ENTRANCE", x: 60, y: 800, width: 120, height: 40, rotation: 0 },
       { chartId: chart.id, kind: "KITCHEN", x: 960, y: 40, width: 180, height: 120, rotation: 0 },
       { chartId: chart.id, kind: "TOILET", x: 1000, y: 280, width: 80, height: 60, rotation: 0, label: "WC 1" },
       { chartId: chart.id, kind: "TOILET", x: 1000, y: 360, width: 80, height: 60, rotation: 0, label: "WC 2" },

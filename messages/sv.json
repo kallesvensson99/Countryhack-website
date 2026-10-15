@@ -78,7 +78,9 @@
     "faqTitle": "Har du frågor?",
     "faqBody": "Åldersgräns, avbokning, mat, vad du ska ta med – svaren finns här.",
     "faqCta": "Vanliga frågor",
-    "others": "Fler kommande event"
+    "others": "Fler kommande event",
+    "mapTitle": "Så ser salen ut",
+    "mapLead": "Se vilka platser som är lediga. Har du en biljett med plats kan du välja din plats direkt här."
   },
   "auth": {
     "email": "E-post",

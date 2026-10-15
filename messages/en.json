@@ -78,7 +78,9 @@
     "faqTitle": "Got questions?",
     "faqBody": "Age limit, cancellations, food, what to bring – the answers are here.",
     "faqCta": "FAQ",
-    "others": "More upcoming events"
+    "others": "More upcoming events",
+    "mapTitle": "The venue floor plan",
+    "mapLead": "See which seats are free. If your ticket includes a seat you can pick it right here."
   },
   "auth": {
     "email": "Email",

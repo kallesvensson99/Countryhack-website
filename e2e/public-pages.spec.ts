@@ -4,6 +4,16 @@ import { db, SLUG } from "./helpers";
 const noHorizontalScroll = (page: import("@playwright/test").Page) => page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
 
 test.describe("landing page", () => {
+  test("shows the seat map with tables, seats and a legend", async ({ page }) => {
+    await page.goto("/sv");
+    const map = page.getByRole("region", { name: "Så ser salen ut" });
+    await expect(map.getByRole("heading", { name: "Så ser salen ut" })).toBeVisible();
+    await expect(map.locator('svg [role="button"]')).toHaveCount(60);
+    await expect(map.getByRole("heading", { name: "Teckenförklaring" })).toBeVisible();
+    await expect(map.getByText("60 av 60 platser är lediga.")).toBeVisible();
+    expect(await noHorizontalScroll(page)).toBe(false);
+  });
+
   test("features the next event with facts and its public tickets", async ({ page }) => {
     await page.goto("/sv");
     await expect(page.getByRole("heading", { level: 1, name: "Countryhack" })).toBeVisible();

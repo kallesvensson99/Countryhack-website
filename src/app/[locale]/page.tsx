@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { HeroScene } from "@/components/hero-scene";
+import { SeatMap } from "@/components/seat-map";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getOrgSettings } from "@/lib/auth/service";
 import { getNextEvent, listUpcomingEvents, saleState, seatAvailability, soldByType } from "@/lib/events/queries";
@@ -9,6 +10,7 @@ import { formatSek } from "@/lib/money";
 import { jsonLd } from "@/lib/seo";
 import { env } from "@/lib/env";
 import { stockholmParts } from "@/lib/age";
+import { getSeatMap } from "@/lib/seating/booking";
 
 const sameDay = (a: Date, b: Date) => JSON.stringify(stockholmParts(a)) === JSON.stringify(stockholmParts(b));
 
@@ -33,6 +35,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
   const org = await getOrgSettings();
   const sold = next ? await soldByType(next.id) : new Map<string, number>();
   const seats = next ? await seatAvailability(next.id, now) : null;
+  const seatMap = next ? await getSeatMap(next.id, user) : null;
 
   const when = (d: Date) => f.dateTime(d, { dateStyle: "long", timeStyle: "short" });
   const day = (d: Date) => f.dateTime(d, { dateStyle: "long" });
@@ -174,6 +177,14 @@ export default async function HomePage({ params, searchParams }: { params: Promi
               </ul>
             )}
           </section>
+
+          {seatMap && (
+            <section aria-label={t("mapTitle")} className="space-y-4">
+              <h2 className="disp text-4xl sm:text-5xl">{t("mapTitle")}</h2>
+              <p className="max-w-xl text-slate-600">{t("mapLead")}</p>
+              <SeatMap data={seatMap} viewer={user ? "member" : "visitor"} />
+            </section>
+          )}
         </>
       ) : (
         <section aria-labelledby="hero-h" className="on-dark -mt-2 space-y-4 rounded-[10px] border-2 border-paper bg-night p-8 text-paper shadow-sticker-hay">

@@ -54,6 +54,9 @@
   .link {
     @apply text-barn underline underline-offset-2 hover:text-ink;
   }
+  .card-hay .link {
+    @apply text-ink hover:text-barn;
+  }
   .on-dark .link {
     @apply text-hay hover:text-paper;
   }

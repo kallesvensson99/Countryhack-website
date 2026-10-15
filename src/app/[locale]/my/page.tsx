@@ -28,40 +28,52 @@ export default async function MyPage({ params }: { params: Promise<{ locale: str
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <h1 className="disp text-5xl">{t("title")}</h1>
 
       <section aria-labelledby="tickets-h" className="space-y-4">
-        <h2 id="tickets-h" className="text-xl font-semibold">{t("ticketsTitle")}</h2>
+        <h2 id="tickets-h" className="disp text-3xl">{t("ticketsTitle")}</h2>
         {tickets.length === 0 && <p className="text-slate-600">{t("empty")}</p>}
+        <div className="grid gap-8 md:grid-cols-2">
         {tickets.map((tk) => (
-          <article key={tk.id} className="card grid gap-4 sm:grid-cols-[1fr_auto]" aria-label={`${tk.event.name} – ${tk.ticketType.name}`}>
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold">
-                <Link href={`/events/${tk.event.slug}`} className="hover:underline">{tk.event.name}</Link>
+          <article key={tk.id} className="overflow-hidden rounded-[10px] border-2 border-ink bg-card shadow-sticker-lg" aria-label={`${tk.event.name} – ${tk.ticketType.name}`}>
+            <div className="on-dark space-y-2 bg-night p-5 text-paper">
+              <p className="eyebrow text-hay">{tk.ticketType.name}</p>
+              <h3 className="disp text-3xl">
+                <Link href={`/events/${tk.event.slug}`} className="no-underline hover:underline">{tk.event.name}</Link>
               </h3>
-              <p>{tk.ticketType.name} · {f.dateTime(tk.event.startsAt, { dateStyle: "long", timeStyle: "short" })}</p>
-              <p>
+              <p className="text-sage">{f.dateTime(tk.event.startsAt, { dateStyle: "long", timeStyle: "short" })}</p>
+            </div>
+            <div aria-hidden className="border-t-[3px] border-dashed border-ink" />
+            <div className="space-y-4 p-5">
+              <p className="text-lg">
                 {tk.status === "PENDING" ? (
-                  <span className="rounded bg-amber-100 px-2 py-0.5 text-sm text-amber-900">{t("unpaid")}</span>
+                  <span className="tag-hay normal-case">{t("unpaid")}</span>
                 ) : tk.seatClaim ? (
-                  <span>{t("seat")}: <strong>{tk.seatClaim.seat.label}</strong> ({tk.seatClaim.seat.zone.name})</span>
+                  <span>{t("seat")}: <strong className="text-2xl font-extrabold">{tk.seatClaim.seat.label}</strong> ({tk.seatClaim.seat.zone.name})</span>
                 ) : tk.ticketType.includesSeat ? (
-                  <Link href={`/events/${tk.event.slug}`} className="link">{t("chooseSeat")}</Link>
+                  <Link href={`/events/${tk.event.slug}`} className="link font-bold">{t("chooseSeat")}</Link>
                 ) : (
                   <span className="text-slate-600">{t("noSeat")}</span>
                 )}
                 {tk.status === "ACTIVE" && tk.seatClaim && <> · <Link href={`/events/${tk.event.slug}`} className="link">{t("changeSeat")}</Link></>}
               </p>
-              {tk.checkedInAt && <p className="text-green-800">{t("checkedIn", { when: f.dateTime(tk.checkedInAt, { timeStyle: "short", dateStyle: "short" }) })}</p>}
+              {tk.checkedInAt && <p className="tag-sage normal-case">{t("checkedIn", { when: f.dateTime(tk.checkedInAt, { timeStyle: "short", dateStyle: "short" }) })}</p>}
+              {qrs.has(tk.id) && (
+                <figure className="flex flex-col items-center gap-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- generated data URL */}
+                  <img src={qrs.get(tk.id)} alt={t("qrAlt", { event: tk.event.name })} width={180} height={180} className="rounded-lg border-2 border-ink bg-white p-2" />
+                  <figcaption className="text-sm text-slate-600">{t("qrHint")}</figcaption>
+                </figure>
+              )}
               {tk.foodPurchases.length > 0 && (
-                <div>
-                  <h4 className="font-semibold">{t("food")}</h4>
-                  <ul className="list-disc pl-5 text-sm">
+                <div className="card-hay !p-4">
+                  <h4 className="disp text-xl">{t("food")}</h4>
+                  <ul className="mt-2 list-disc pl-5 text-sm">
                     {tk.foodPurchases.map((fp) => (
                       <li key={fp.id}>
                         {fp.package.name} – {fp.variant.name}
                         {fp.status === "PENDING" ? ` (${t("unpaid")})` : ""}
-                        <span className="text-slate-600"> · {fp.package.meals.map((m) => m.meal.name).join(", ")}</span>
+                        <span> · {fp.package.meals.map((m) => m.meal.name).join(", ")}</span>
                       </li>
                     ))}
                   </ul>
@@ -69,19 +81,13 @@ export default async function MyPage({ params }: { params: Promise<{ locale: str
               )}
               <p><Link href={`/my/orders/${tk.order.number}`} className="link">{t("receipt")} {tk.order.number}</Link></p>
             </div>
-            {qrs.has(tk.id) && (
-              <figure className="text-center">
-                {/* eslint-disable-next-line @next/next/no-img-element -- generated data URL */}
-                <img src={qrs.get(tk.id)} alt={t("qrAlt", { event: tk.event.name })} width={180} height={180} className="mx-auto rounded border border-slate-300" />
-                <figcaption className="mt-1 text-xs text-slate-600">{t("qrHint")}</figcaption>
-              </figure>
-            )}
           </article>
         ))}
+        </div>
       </section>
 
       <section aria-labelledby="orders-h" className="space-y-3">
-        <h2 id="orders-h" className="text-xl font-semibold">{t("ordersTitle")}</h2>
+        <h2 id="orders-h" className="disp text-3xl">{t("ordersTitle")}</h2>
         {orders.length === 0 ? (
           <p className="text-slate-600">{t("noOrders")}</p>
         ) : (

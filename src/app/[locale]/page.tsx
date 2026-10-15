@@ -68,7 +68,6 @@ export default async function HomePage({ params, searchParams }: { params: Promi
   return (
     <div className="space-y-16">
       {deleted && <p role="status" className="rounded-md border-2 border-ink bg-sage p-3 font-medium text-ink">{t("deleted")}</p>}
-      {eventLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(eventLd) }} />}
 
       {next ? (
         <>
@@ -224,6 +223,7 @@ export default async function HomePage({ params, searchParams }: { params: Promi
           </ul>
         </section>
       )}
+      {eventLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(eventLd) }} />}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/auth/password";
+import { DEFAULT_JOBS } from "../src/lib/crew/service";
 import { copyChart } from "../src/lib/seating/copy";
 
 const db = new PrismaClient();
@@ -11,6 +12,7 @@ export const SEED_PASSWORD = "Password123!";
 const users = [
   { email: "admin@ccss.test", realName: "Admin Adminsson", nickname: "admin", birth: "1990-05-10", tags: ["ADMIN"] as const, verified: true },
   { email: "leader@ccss.test", realName: "Frida Festivalledare", nickname: "frida", birth: "1992-03-21", tags: ["FESTIVALLEDARE"] as const, verified: true },
+  { email: "ansvarig@ccss.test", realName: "Anders Ansvarig", nickname: "anders", birth: "1991-08-14", tags: ["ANSVARIG"] as const, verified: true },
   { email: "member@ccss.test", realName: "Maja Medlem", nickname: "maja", birth: "1998-11-02", tags: [] as const, verified: true },
   {
     email: "minor@ccss.test",
@@ -56,6 +58,10 @@ async function main() {
     }
   }
   await seedExampleEvent();
+  // The crew page starts with these jobs; once seeded they are editable in the app.
+  for (const [sortOrder, j] of DEFAULT_JOBS.entries()) {
+    if (!(await db.crewJob.findFirst({ where: { title: j.title, createdById: null } }))) await db.crewJob.create({ data: { ...j, sortOrder } });
+  }
   console.log(`Seeded ${users.length} users (password: ${SEED_PASSWORD}).`);
 }
 

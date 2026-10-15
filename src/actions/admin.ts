@@ -10,7 +10,7 @@ import { echoValues, fieldErrors, formToObject, orgSettingsSchema, type ActionSt
 
 const tagSchema = z.object({
   userId: z.string().min(1),
-  tag: z.enum(["FESTIVALLEDARE", "ADMIN"]),
+  tag: z.enum(["FESTIVALLEDARE", "ANSVARIG", "ADMIN"]),
   enabled: z.enum(["true", "false"]).transform((v) => v === "true"),
 });
 

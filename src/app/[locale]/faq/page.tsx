@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getOrgSettings } from "@/lib/auth/service";
 import { FAQ_GROUPS } from "@/lib/content/faq";
+import { loadCustomFaq } from "@/lib/content/faq-store";
 import { getNextEvent } from "@/lib/events/queries";
 import { jsonLd } from "@/lib/seo";
 
@@ -20,7 +21,8 @@ export default async function FaqPage({ params }: { params: Promise<{ locale: st
   // Answers mention the live age limit and the real contact address instead of hard-coded text.
   const values = { minAge: next?.minAge ?? 14, contact: org.contactEmail ?? t("contactFallback") };
 
-  const groups = FAQ_GROUPS.map((g) => ({ id: g.id, items: g.items.map((id) => ({ id, q: t(`q_${id}`), a: t(`a_${id}`, values) })) }));
+  // Questions edited by Festivalledare win; until anyone has customised the FAQ the built-in texts are shown.
+  const groups = (await loadCustomFaq(locale, values)) ?? FAQ_GROUPS.map((g) => ({ id: g.id, items: g.items.map((id) => ({ id, q: t(`q_${id}`), a: t(`a_${id}`, values) })) }));
   const ld = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

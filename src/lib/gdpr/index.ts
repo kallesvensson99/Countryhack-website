@@ -21,6 +21,7 @@ export async function exportUserData(userId: string) {
       },
       orders: { include: { items: true, payments: { select: { provider: true, kind: true, amountOre: true, status: true, createdAt: true } } } },
       reservedSeats: { select: { label: true } },
+      crewApplications: { include: { job: { select: { title: true } } } },
     },
   });
   const { passwordHash: _passwordHash, ...profile } = user;
@@ -81,6 +82,7 @@ export async function anonymizeUser(
     await tx.session.deleteMany({ where: { userId } });
     await tx.authToken.deleteMany({ where: { userId } });
     await tx.userTag.deleteMany({ where: { userId } });
+    await tx.crewApplication.deleteMany({ where: { userId } }); // free-text motivation is personal data
     await tx.consent.updateMany({ where: { userId }, data: { ip: null } });
     await tx.seat.updateMany({ where: { reservedForUserId: userId }, data: { reservedForUserId: null } });
     await tx.foodPurchase.updateMany({ where: { ticket: { userId } }, data: { allergiesSnapshot: null } });

@@ -1,3 +1,4 @@
+import type { UserTagKind } from "@prisma/client";
 import { db } from "@/lib/db";
 import type { Actor } from "@/lib/permissions";
 import type { CheckoutSession, CreateSessionInput, PaymentProvider, ProviderEvent, RefundInput } from "@/lib/payments";
@@ -32,7 +33,7 @@ export class FakeProvider implements PaymentProvider {
   }
 }
 
-export const actorOf = (u: { id: string; emailVerifiedAt: Date | null; tags?: { tag: "ADMIN" | "FESTIVALLEDARE" }[] }): Actor => ({
+export const actorOf = (u: { id: string; emailVerifiedAt: Date | null; tags?: { tag: UserTagKind }[] }): Actor => ({
   id: u.id,
   emailVerifiedAt: u.emailVerifiedAt,
   tags: (u.tags ?? []).map((t) => t.tag),

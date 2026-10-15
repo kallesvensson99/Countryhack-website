@@ -27,6 +27,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const [messages, t, user, org] = await Promise.all([getMessages(), getTranslations("nav"), getCurrentUser(), getOrgSettings()]);
   const isAdmin = user?.tags.includes("ADMIN");
   const isLeader = user?.tags.includes("FESTIVALLEDARE");
+  const isCrewStaff = isLeader || user?.tags.includes("ANSVARIG");
 
   return (
     <html lang={locale}>
@@ -55,6 +56,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
                     <Link href="/my" className="hover:underline">{t("myPages")}</Link>
                     <Link href="/profile" className="hover:underline">{t("profile")}</Link>
                     {isLeader && <Link href="/manage/events" className="hover:underline">{t("manageEvents")}</Link>}
+                    {isCrewStaff && <Link href="/manage/crew" className="hover:underline">{t("manageCrew")}</Link>}
+                    {isLeader && <Link href="/manage/faq" className="hover:underline">{t("manageFaq")}</Link>}
                     {isAdmin && <Link href="/admin/users" className="hover:underline">{t("admin")}</Link>}
                     <form action={logoutAction}>
                       <button type="submit" className="hover:underline">{t("logout")}</button>

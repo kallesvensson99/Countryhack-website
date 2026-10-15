@@ -14,7 +14,7 @@ import { FakeProvider, actorOf, buyPaid, shop, type Shop } from "./commerce-help
 import { makeUser, resetDb } from "./helpers";
 
 // The CSV route authenticates through the session cookie; here we just decide who is "logged in".
-const session = vi.hoisted(() => ({ user: null as null | { id: string; emailVerifiedAt: Date | null; tags: readonly ("FESTIVALLEDARE" | "ADMIN")[] } }));
+const session = vi.hoisted(() => ({ user: null as null | { id: string; emailVerifiedAt: Date | null; tags: readonly ("FESTIVALLEDARE" | "ANSVARIG" | "ADMIN")[] } }));
 vi.mock("@/lib/auth/current-user", () => ({ getCurrentUser: async () => session.user }));
 vi.mock("@/lib/auth/request", () => ({ getClientIp: async () => "9.9.9.9", getUserAgent: async () => "vitest", isSameOrigin: () => true }));
 

@@ -48,7 +48,7 @@ export default async function AdminUsersPage({ params, searchParams }: { params:
                   </div>
                   {!u.anonymizedAt && (
                     <div className="flex flex-wrap gap-2">
-                      {(["FESTIVALLEDARE", "ADMIN"] as const).map((tag) => (
+                      {(["FESTIVALLEDARE", "ANSVARIG", "ADMIN"] as const).map((tag) => (
                         <TagToggle key={tag} userId={u.id} tag={tag} enabled={tags.includes(tag)} userLabel={u.nickname} />
                       ))}
                     </div>

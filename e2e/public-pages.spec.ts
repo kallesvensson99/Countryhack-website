@@ -134,22 +134,15 @@ test.describe("FAQ", () => {
 });
 
 test.describe("crew page", () => {
-  test("lists the jobs and explains how to apply, with a ready-made email", async ({ page }) => {
+  test("lists the open jobs with an apply link and explains how to apply", async ({ page }) => {
     await page.goto("/sv/crew");
     await expect(page.getByRole("heading", { level: 1, name: "Bli crew" })).toBeVisible();
     await expect(page.getByRole("note").first()).toContainText("Countryhack");
     const jobs = page.getByRole("region", { name: "Uppgifter vi behöver hjälp med" });
     for (const j of ["Incheckning och information", "Kök och mat", "Teknik och nätverk", "Värdar och trygghet", "Uppbyggnad och nedrivning"]) await expect(jobs.getByRole("heading", { name: j })).toBeVisible();
     await expect(jobs.getByText("Före").first()).toBeVisible();
-
-    const apply = page.getByRole("link", { name: "Anmäl intresse via e-post" }).first();
-    const href = (await apply.getAttribute("href"))!;
-    const url = new URL(href);
-    expect(url.protocol).toBe("mailto:");
-    expect(url.pathname).toBe("info@ccss.test");
-    expect(url.searchParams.get("subject")).toBe("Crew: Countryhack");
-    expect(url.searchParams.get("body")).toContain("Uppgift jag är intresserad av:");
-    await expect(page.getByText("Mejla oss på info@ccss.test")).toBeVisible();
+    await expect(jobs.getByRole("link", { name: "Ansök till Kök och mat" })).toHaveAttribute("href", /\/sv\/crew\/apply\?job=/);
+    await expect(page.getByText("Hellre via e-post? Skriv till info@ccss.test.")).toBeVisible();
     await expect(page.getByText("Har du inget konto än?")).toBeVisible();
   });
 
@@ -161,13 +154,13 @@ test.describe("crew page", () => {
     await expect(page).toHaveURL(/\/en\/faq$/);
   });
 
-  test("without a contact address it says so instead of showing a dead button", async ({ page }) => {
+  test("without a contact address the e-mail alternative is left out", async ({ page }) => {
     const org = await db.orgSettings.findFirstOrThrow();
     await db.orgSettings.update({ where: { id: org.id }, data: { contactEmail: null } });
     try {
       await page.goto("/sv/crew");
-      await expect(page.getByRole("link", { name: "Anmäl intresse via e-post" })).toHaveCount(0);
-      await expect(page.getByText("Föreningens kontaktuppgifter är inte inlagda än")).toBeVisible();
+      await expect(page.getByText("Hellre via e-post?")).toHaveCount(0);
+      await expect(page.getByRole("link", { name: "Ansök till Kök och mat" })).toBeVisible();
       await page.goto("/sv/faq");
       await page.locator("details#q-contact summary").click();
       await expect(page.locator("details#q-contact")).toContainText("föreningens kontaktuppgifter");

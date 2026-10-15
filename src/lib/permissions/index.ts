@@ -8,6 +8,8 @@ import type { EventStatus, UserTagKind } from "@prisma/client";
  *  - visitor: user === null
  *  - member:  logged in. Buying / choosing seats additionally needs a verified email.
  *  - FESTIVALLEDARE tag: all member abilities + all event management.
+ *  - ANSVARIG tag: may post crew jobs and manage (edit, close, review applications for) their OWN jobs.
+ *    Festivalledare manage all crew jobs and the FAQ.
  *  - ADMIN tag: user and org management; may also *view* draft events. Admin does
  *    NOT implicitly get event-management rights (grant the FESTIVALLEDARE tag for that).
  */
@@ -36,6 +38,7 @@ export const ACTIONS = {
   "ticket:buy": "verifiedMember",
   "food:buy": "verifiedMember",
   "seat:choose": "verifiedMember",
+  "crewApplication:create": "verifiedMember",
   "order:view": "ownerOrStaff",
   "ticket:view": "ownerOrStaff",
   // Festivalledare
@@ -52,6 +55,10 @@ export const ACTIONS = {
   "order:cancel": "festivalledare",
   "order:refund": "festivalledare",
   "broadcast:send": "festivalledare",
+  "faq:manage": "festivalledare",
+  // Crew jobs: Ansvarig may create and then manage their own; Festivalledare manage all
+  "crewJob:create": "crewStaff",
+  "crewJob:edit": "crewOwnerOrLeader", // resource.ownerId = the job's creator; also covers viewing its applications
   // Admin
   "user:manage": "admin",
   "userTag:manage": "admin",
@@ -59,7 +66,7 @@ export const ACTIONS = {
   "audit:view": "admin",
 } as const satisfies Record<string, Rule>;
 
-type Rule = "public" | "self" | "verifiedMember" | "ownerOrStaff" | "festivalledare" | "admin";
+type Rule = "public" | "self" | "verifiedMember" | "ownerOrStaff" | "festivalledare" | "crewStaff" | "crewOwnerOrLeader" | "admin";
 
 export type Action = keyof typeof ACTIONS;
 
@@ -81,6 +88,10 @@ export function can(user: Actor | null, action: Action, resource: Resource = {})
       return !!user && (has(user, "FESTIVALLEDARE") || resource.ownerId === user.id);
     case "festivalledare":
       return !!user && has(user, "FESTIVALLEDARE");
+    case "crewStaff":
+      return !!user && (has(user, "FESTIVALLEDARE") || has(user, "ANSVARIG"));
+    case "crewOwnerOrLeader":
+      return !!user && (has(user, "FESTIVALLEDARE") || (has(user, "ANSVARIG") && resource.ownerId !== undefined && resource.ownerId === user.id));
     case "admin":
       return !!user && has(user, "ADMIN");
   }

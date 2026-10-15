@@ -8,7 +8,7 @@ import { Field, FormMessage, SubmitButton } from "./form";
 
 const initial: ActionState = {};
 
-export function TagToggle({ userId, tag, enabled, userLabel }: { userId: string; tag: "FESTIVALLEDARE" | "ADMIN"; enabled: boolean; userLabel: string }) {
+export function TagToggle({ userId, tag, enabled, userLabel }: { userId: string; tag: "FESTIVALLEDARE" | "ANSVARIG" | "ADMIN"; enabled: boolean; userLabel: string }) {
   const t = useTranslations("admin");
   const [state, action] = useActionState(setTagAction, initial);
   const tAll = useTranslations();

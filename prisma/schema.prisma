@@ -17,6 +17,20 @@ datasource db {
 enum UserTagKind {
   FESTIVALLEDARE
   ADMIN
+  ANSVARIG // may post and manage their own crew jobs
+}
+
+enum FaqGroup {
+  TICKETS
+  SEATS_FOOD
+  ON_SITE
+  ACCOUNT
+}
+
+enum CrewApplicationStatus {
+  NEW
+  ACCEPTED
+  DECLINED
 }
 
 enum AuthTokenType {
@@ -132,6 +146,8 @@ model User {
   broadcastsSent   Broadcast[]
   tagsGranted      UserTag[]        @relation("TagGrantedBy")
   auditLogs        AuditLog[]
+  crewJobsCreated  CrewJob[]
+  crewApplications CrewApplication[]
 }
 
 model UserTag {
@@ -671,4 +687,59 @@ model Broadcast {
 
   event  Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
   sentBy User  @relation(fields: [sentById], references: [id])
+}
+
+/// One editable FAQ entry. The English text is optional: an empty one falls back to Swedish.
+model FaqItem {
+  id         String   @id @default(cuid())
+  group      FaqGroup
+  questionSv String
+  answerSv   String
+  questionEn String   @default("")
+  answerEn   String   @default("")
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([group, sortOrder])
+}
+
+/// A crew job anyone may apply to while it is open.
+model CrewJob {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  titleEn       String   @default("")
+  descriptionEn String   @default("")
+  before        Boolean  @default(false) // needed before the event
+  during        Boolean  @default(true) // needed during the event
+  after         Boolean  @default(false) // needed after the event
+  spots         Int? // how many people are needed; null = not stated
+  isOpen        Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdById   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  createdBy    User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  applications CrewApplication[]
+
+  @@index([isOpen, sortOrder])
+}
+
+model CrewApplication {
+  id           String                @id @default(cuid())
+  jobId        String
+  userId       String
+  message      String
+  availability String
+  status       CrewApplicationStatus @default(NEW)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+
+  job  CrewJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, userId])
+  @@index([userId])
 }

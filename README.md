@@ -31,7 +31,8 @@ All use the password **`Password123!`**.
 | Email | Role | Notes |
 |---|---|---|
 | `admin@ccss.test` | Admin | users, tags, org settings, audit log |
-| `leader@ccss.test` | Festivalledare | manage events at `/sv/manage/events` |
+| `leader@ccss.test` | Festivalledare | manage events at `/sv/manage/events`, the FAQ at `/sv/manage/faq` and all crew jobs at `/sv/manage/crew` |
+| `ansvarig@ccss.test` | Ansvarig | post crew jobs and manage their own (and the applications to them) at `/sv/manage/crew` |
 | `member@ccss.test` | Member | adult, verified |
 | `minor@ccss.test` | Member, 15 years old | has guardian name + phone |
 | `unverified@ccss.test` | Member | email not verified (can't buy) |
@@ -170,6 +171,7 @@ docker compose -f docker-compose.prod.yml exec -T db pg_restore -U ccss -d ccss 
 
 See the stage summary in the conversation; the short version:
 
+- **Ansvarig** (tag) may post crew jobs and edit, close, delete and review applications for the jobs they posted themselves. Festivalledare manage every crew job and the FAQ. Applying needs a verified account (`/sv/crew/apply`); applications hold free text, so they are erased on account deletion and included in the data export.
 - Admin can view draft events but does **not** implicitly get Festivalledare's management rights (an admin can grant themselves the tag).
 - Email is not editable on the profile (avoids re-verification flows for now).
 - Registration says when an email/nickname is already taken (rate-limited per IP); password reset never reveals whether an account exists.

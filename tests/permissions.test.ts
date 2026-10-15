@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 import { ACTIONS, assertCan, can, ForbiddenError, UnauthenticatedError, type Action, type Actor } from "@/lib/permissions";
 
 const verified = new Date();
-type Role = "visitor" | "unverified" | "member" | "festivalledare" | "admin" | "both";
+type Role = "visitor" | "unverified" | "member" | "festivalledare" | "ansvarig" | "admin" | "both";
 const actors: Record<Role, Actor | null> = {
   visitor: null,
   unverified: { id: "u-unverified", emailVerifiedAt: null, tags: [] },
   member: { id: "u-member", emailVerifiedAt: verified, tags: [] },
   festivalledare: { id: "u-fl", emailVerifiedAt: verified, tags: ["FESTIVALLEDARE"] },
+  ansvarig: { id: "u-ansvarig", emailVerifiedAt: verified, tags: ["ANSVARIG"] },
   admin: { id: "u-admin", emailVerifiedAt: verified, tags: ["ADMIN"] },
   both: { id: "u-both", emailVerifiedAt: verified, tags: ["ADMIN", "FESTIVALLEDARE"] },
 };
@@ -16,14 +17,14 @@ const actors: Record<Role, Actor | null> = {
 // Role × action matrix with no resource (i.e. "may this role ever do this at all").
 // Actions that depend on ownership are tested separately below; here self/owner actions use the actor's own id.
 const allow: Record<Action, Role[]> = {
-  "event:view": ["visitor", "unverified", "member", "festivalledare", "admin", "both"],
-  "chart:view": ["visitor", "unverified", "member", "festivalledare", "admin", "both"],
-  "profile:edit": ["unverified", "member", "festivalledare", "admin", "both"],
-  "account:export": ["unverified", "member", "festivalledare", "admin", "both"],
-  "account:delete": ["unverified", "member", "festivalledare", "admin", "both"],
-  "ticket:buy": ["member", "festivalledare", "admin", "both"],
-  "food:buy": ["member", "festivalledare", "admin", "both"],
-  "seat:choose": ["member", "festivalledare", "admin", "both"],
+  "event:view": ["visitor", "unverified", "member", "ansvarig", "festivalledare", "admin", "both"],
+  "chart:view": ["visitor", "unverified", "member", "ansvarig", "festivalledare", "admin", "both"],
+  "profile:edit": ["unverified", "member", "ansvarig", "festivalledare", "admin", "both"],
+  "account:export": ["unverified", "member", "ansvarig", "festivalledare", "admin", "both"],
+  "account:delete": ["unverified", "member", "ansvarig", "festivalledare", "admin", "both"],
+  "ticket:buy": ["member", "ansvarig", "festivalledare", "admin", "both"],
+  "food:buy": ["member", "ansvarig", "festivalledare", "admin", "both"],
+  "seat:choose": ["member", "ansvarig", "festivalledare", "admin", "both"],
   "order:view": ["festivalledare", "both"], // others only for their own (tested below)
   "ticket:view": ["festivalledare", "both"],
   "event:manage": ["festivalledare", "both"],
@@ -39,6 +40,10 @@ const allow: Record<Action, Role[]> = {
   "order:cancel": ["festivalledare", "both"],
   "order:refund": ["festivalledare", "both"],
   "broadcast:send": ["festivalledare", "both"],
+  "crewApplication:create": ["member", "ansvarig", "festivalledare", "admin", "both"],
+  "faq:manage": ["festivalledare", "both"],
+  "crewJob:create": ["festivalledare", "ansvarig", "both"],
+  "crewJob:edit": ["festivalledare", "both"], // Ansvarig only for their own jobs (tested below)
   "user:manage": ["admin", "both"],
   "userTag:manage": ["admin", "both"],
   "orgSettings:edit": ["admin", "both"],
@@ -61,6 +66,29 @@ describe("permission matrix (role × action)", () => {
       });
     }
   }
+});
+
+describe("crew job ownership", () => {
+  const ansvarig = actors.ansvarig as Actor;
+  const other = actors.member as Actor;
+
+  it("Ansvarig may manage their own crew jobs but not other people's", () => {
+    expect(can(ansvarig, "crewJob:edit", { ownerId: ansvarig.id })).toBe(true);
+    expect(can(ansvarig, "crewJob:edit", { ownerId: other.id })).toBe(false);
+    expect(can(ansvarig, "crewJob:edit", {})).toBe(false);
+  });
+
+  it("Festivalledare may manage every crew job; plain members and Admin may not", () => {
+    expect(can(actors.festivalledare, "crewJob:edit", { ownerId: other.id })).toBe(true);
+    expect(can(other, "crewJob:edit", { ownerId: other.id })).toBe(false);
+    expect(can(actors.admin, "crewJob:edit", { ownerId: other.id })).toBe(false);
+  });
+
+  it("Ansvarig gets no other management rights", () => {
+    expect(can(ansvarig, "event:manage")).toBe(false);
+    expect(can(ansvarig, "faq:manage")).toBe(false);
+    expect(can(ansvarig, "user:manage")).toBe(false);
+  });
 });
 
 describe("ownership rules", () => {

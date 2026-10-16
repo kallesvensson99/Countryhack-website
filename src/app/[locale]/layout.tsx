@@ -31,7 +31,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const isCrewStaff = isLeader || user?.tags.includes("ANSVARIG");
 
   return (
-    <html lang={locale}>
+    // suppressHydrationWarning: browser extensions (e.g. LanguageTool) add attributes to <html> before React hydrates.
+    <html lang={locale} suppressHydrationWarning>
       <body>
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:p-3">
           {(await getTranslations("common"))("skipToContent")}

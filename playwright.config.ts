@@ -45,6 +45,7 @@ export default defineConfig({
       APP_URL: `http://localhost:${port}`,
       APP_SECRET: "e2e-secret-e2e-secret-e2e-secret-123456",
       NODE_ENV: "production",
+      NEXT_DIST_DIR: ".next-e2e", // separate from the dev server's .next
       ALLOW_SEED: "1", // the seed refuses to run in production otherwise
       PAYMENT_PROVIDER: "mock", // fake checkout page instead of Stripe (only works on localhost)
     },

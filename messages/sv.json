@@ -1085,7 +1085,7 @@
   },
   "sponsorsManage": {
     "title": "Sponsorer",
-    "lead": "Logotyperna visas längst ner på startsidan, grupperade efter nivå.",
+    "lead": "Logotyperna visas i sidfoten på alla sidor, grupperade efter nivå.",
     "viewPage": "Visa startsidan",
     "newSponsor": "Lägg till en sponsor",
     "none": "Inga sponsorer än.",
@@ -1098,7 +1098,7 @@
     "logoHint": "PNG, JPG eller WebP, högst 5 MB. En bred logotyp med genomskinlig eller vit bakgrund fungerar bäst.",
     "sortOrder": "Ordning",
     "sortOrderHint": "Lägre tal visas först inom sin nivå.",
-    "isActive": "Visa på startsidan",
+    "isActive": "Visa i sidfoten",
     "save": "Spara sponsorn",
     "create": "Lägg till sponsorn",
     "delete": "Ta bort sponsorn",

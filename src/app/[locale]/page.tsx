@@ -11,7 +11,6 @@ import { jsonLd } from "@/lib/seo";
 import { env } from "@/lib/env";
 import { stockholmParts } from "@/lib/age";
 import { getSeatMap } from "@/lib/seating/booking";
-import { groupByTier, listSponsors } from "@/lib/sponsors/service";
 
 const sameDay = (a: Date, b: Date) => JSON.stringify(stockholmParts(a)) === JSON.stringify(stockholmParts(b));
 
@@ -37,8 +36,6 @@ export default async function HomePage({ params, searchParams }: { params: Promi
   const sold = next ? await soldByType(next.id) : new Map<string, number>();
   const seats = next ? await seatAvailability(next.id, now) : null;
   const seatMap = next ? await getSeatMap(next.id, user) : null;
-  const sponsorGroups = groupByTier(await listSponsors({ onlyActive: true }));
-  const ts = await getTranslations("sponsors");
 
   const when = (d: Date) => f.dateTime(d, { dateStyle: "long", timeStyle: "short" });
   const day = (d: Date) => f.dateTime(d, { dateStyle: "long" });
@@ -235,33 +232,6 @@ export default async function HomePage({ params, searchParams }: { params: Promi
               </li>
             ))}
           </ul>
-        </section>
-      )}
-
-      {sponsorGroups.length > 0 && (
-        <section aria-labelledby="sponsors-h" className="space-y-8 border-t-4 border-ink pt-10">
-          <h2 id="sponsors-h" className="disp text-4xl sm:text-5xl">{ts("title")}</h2>
-          {sponsorGroups.map((g) => (
-            <div key={g.tier} className="space-y-4">
-              <h3 className="eyebrow text-slate-600">{ts(`tier_${g.tier}`)}</h3>
-              <ul className="flex flex-wrap items-center gap-6">
-                {g.sponsors.map((s) => {
-                  const size = g.tier === "MAIN" ? "h-28 max-w-[22rem]" : g.tier === "LARGE" ? "h-20 max-w-[16rem]" : "h-14 max-w-[11rem]";
-                  // eslint-disable-next-line @next/next/no-img-element -- uploaded logo
-                  const img = <img src={s.logoPath} alt={s.name} className={`${size} w-auto object-contain`} />;
-                  return (
-                    <li key={s.id} className="flex items-center rounded-lg border-2 border-ink bg-white p-3 shadow-sticker">
-                      {s.url ? (
-                        <a href={s.url} target="_blank" rel="noopener noreferrer sponsored" className="flex min-h-11 items-center">{img}</a>
-                      ) : (
-                        img
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
         </section>
       )}
 

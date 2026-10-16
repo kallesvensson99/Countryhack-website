@@ -1085,7 +1085,7 @@
   },
   "sponsorsManage": {
     "title": "Sponsors",
-    "lead": "The logos are shown at the bottom of the landing page, grouped by tier.",
+    "lead": "The logos are shown in the footer of every page, grouped by tier.",
     "viewPage": "View the landing page",
     "newSponsor": "Add a sponsor",
     "none": "No sponsors yet.",
@@ -1098,7 +1098,7 @@
     "logoHint": "PNG, JPG or WebP, up to 5 MB. A wide logo with a transparent or white background works best.",
     "sortOrder": "Order",
     "sortOrderHint": "Lower numbers come first within their tier.",
-    "isActive": "Show on the landing page",
+    "isActive": "Show in the footer",
     "save": "Save sponsor",
     "create": "Add sponsor",
     "delete": "Delete sponsor",

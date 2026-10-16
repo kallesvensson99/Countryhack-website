@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { logoutAction } from "@/actions/auth";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { SponsorsFooter } from "@/components/sponsors-footer";
 import { getOrgSettings } from "@/lib/auth/service";
 import "../globals.css";
 
@@ -77,7 +78,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
             {children}
           </main>
           <footer className="on-dark mt-10 bg-night text-paper print:hidden">
-           <div className="mx-auto max-w-5xl space-y-2 px-4 py-10 text-sm text-sage">
+           <div className="mx-auto max-w-5xl space-y-6 px-4 py-10 text-sm text-sage">
+            <SponsorsFooter />
+            <div className="space-y-2">
             <p>
               {org.name}
               {org.orgNumber ? ` · ${org.orgNumber}` : ""}
@@ -86,6 +89,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
             <p>
               <Link href="/privacy" className="link text-hay">{t("privacy")}</Link>
             </p>
+            </div>
            </div>
           </footer>
         </NextIntlClientProvider>

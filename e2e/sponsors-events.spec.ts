@@ -80,6 +80,7 @@ test.describe("sponsors", () => {
 
     await page.goto("/sv");
     const region = page.getByRole("region", { name: "Våra sponsorer" });
+    await expect(page.getByRole("contentinfo").getByRole("region", { name: "Våra sponsorer" })).toBeVisible(); // it lives in the footer
     await expect(region).toBeVisible();
     const tiers = await region.getByRole("heading", { level: 3 }).allTextContents();
     expect(tiers).toEqual(["Huvudsponsor", "Stor sponsor", "Sponsor"]);
@@ -90,6 +91,12 @@ test.describe("sponsors", () => {
     await expect(region.getByRole("link", { name: "Kabelkungen" })).toHaveAttribute("href", "https://kabelkungen.example/");
     await expect(region.getByRole("link", { name: "Kabelkungen" })).toHaveAttribute("rel", /noopener/);
     await expect(region.getByRole("link", { name: "Småfirman" })).toHaveCount(0); // no link given
+    // the footer is on every page, so the sponsors are always visible
+    for (const path of ["/sv/faq", "/sv/events", "/en/crew"]) {
+      await page.goto(path);
+      await expect(page.getByRole("contentinfo").getByRole("img", { name: "Kabelkungen" })).toBeVisible();
+    }
+    await page.goto("/sv");
     // the logo file is really served
     const src = (await region.getByRole("img", { name: "Kabelkungen" }).getAttribute("src"))!;
     expect(src).toMatch(/^\/uploads\/sponsors\/[a-f0-9]{32}\.png$/);

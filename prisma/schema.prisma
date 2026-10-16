@@ -743,3 +743,24 @@ model CrewApplication {
   @@unique([jobId, userId])
   @@index([userId])
 }
+
+enum SponsorTier {
+  MAIN // huvudsponsor
+  LARGE // stor sponsor
+  REGULAR // sponsor
+}
+
+/// A sponsor whose logo is shown at the bottom of the landing page, grouped by tier.
+model Sponsor {
+  id        String      @id @default(cuid())
+  name      String
+  tier      SponsorTier
+  logoPath  String // "/uploads/sponsors/<hex>.<ext>"
+  url       String? // optional link, http(s) only
+  sortOrder Int         @default(0)
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([tier, sortOrder])
+}

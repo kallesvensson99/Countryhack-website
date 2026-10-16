@@ -64,7 +64,8 @@ test.describe("buying", () => {
     await expect(page.getByText("Att betala").locator("..")).toContainText("243 kr"); // (150 + 120) − 10 %
 
     // seat chosen as part of checkout; VIP seats are not selectable for a Standard ticket
-    await page.getByText("Välj plats nu (valfritt)").click();
+    await expect(page.getByRole("button", { name: "Gå till betalning" })).toBeDisabled(); // a seat is required
+    await expect(page.getByText("Välj en plats på kartan för att kunna gå vidare till betalning.")).toBeVisible();
     await expect(seat(page, "V1")).toHaveAttribute("aria-disabled", "true");
     await seat(page, "A5").click();
     await expect(page.getByText("Du har valt plats A5.")).toBeVisible();
@@ -86,7 +87,6 @@ test.describe("buying", () => {
     // start over (replaces the unpaid order) and pay this time
     await page.getByRole("radio", { name: /Standard med plats/ }).check();
     await page.getByRole("checkbox", { name: /^Fredagsmiddag/ }).check();
-    await page.getByText("Välj plats nu (valfritt)").click();
     await seat(page, "A5").click();
     await expect(page.getByText("Du har valt plats A5.")).toBeVisible();
     await page.getByRole("button", { name: "Gå till betalning" }).click();
@@ -170,6 +170,8 @@ test.describe("buying", () => {
     await expect(page.getByText("Koden CREW är använd.")).toBeVisible();
     await page.getByRole("radio", { name: /Crew/ }).check();
     await expect(page.getByText("Inget att betala")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Slutför beställningen" })).toBeDisabled(); // even a free Crew ticket needs a seat
+    await seat(page, "B2").click();
     await page.getByRole("button", { name: "Slutför beställningen" }).click();
 
     await expect(page).toHaveURL(/\/my\/orders\/CCSS-/);

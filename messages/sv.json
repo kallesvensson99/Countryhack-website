@@ -143,7 +143,8 @@
     "codeFormat": "Koden ska vara 2–32 tecken: bokstäver, siffror, - och _.",
     "percentInvalid": "Ange ett heltal mellan 1 och 100.",
     "codeTaken": "Det finns redan en kod med det namnet på eventet.",
-    "crewWhen": "Välj minst en tidpunkt."
+    "crewWhen": "Välj minst en tidpunkt.",
+    "urlInvalid": "Skriv en webbadress som börjar med http:// eller https://."
   },
   "messages": {
     "rateLimited": "För många försök. Vänta en stund och försök igen.",
@@ -228,7 +229,10 @@
     "faqDeleted": "Frågan är borttagen.",
     "faqMoved": "Ordningen är ändrad.",
     "faqImported": "De inbyggda frågorna är importerade och kan nu redigeras.",
-    "faqAlreadyImported": "Frågorna är redan importerade."
+    "faqAlreadyImported": "Frågorna är redan importerade.",
+    "sponsorSaved": "Sponsorn är sparad.",
+    "sponsorDeleted": "Sponsorn är borttagen.",
+    "sponsorLogoRequired": "Välj en logotyp att ladda upp."
   },
   "profile": {
     "title": "Min profil",
@@ -376,7 +380,9 @@
     "removeImage": "Ta bort bild",
     "imageAlt": "Bild för {name}",
     "foodTitle": "Mat",
-    "foodOrderBy": "beställ senast {when}"
+    "foodOrderBy": "beställ senast {when}",
+    "ticketsHeading": "Biljetter",
+    "past": "Avslutat"
   },
   "manage": {
     "title": "Hantera event",
@@ -403,7 +409,10 @@
     "checkinLink": "Incheckning",
     "attendeesLink": "Deltagare",
     "statsLink": "Statistik",
-    "broadcastLink": "Mejla deltagare"
+    "broadcastLink": "Mejla deltagare",
+    "crewLink": "Crew-jobb",
+    "faqLink": "Vanliga frågor",
+    "sponsorsLink": "Sponsorer"
   },
   "tickets": {
     "title": "Biljettyper",
@@ -479,7 +488,7 @@
     "checkoutChosen": "Du har valt plats {seat}.",
     "checkoutHold": "Platsen hålls åt dig medan du betalar (30 minuter).",
     "checkoutClear": "Ta bort valet",
-    "checkoutPick": "Välj en ledig plats, eller hoppa över och välj efter köpet."
+    "checkoutPick": "Välj en ledig plats på kartan."
   },
   "editor": {
     "title": "Platskarta",
@@ -629,7 +638,6 @@
     "addFood": "Lägg till mat (valfritt)",
     "orderBy": "beställ senast {when}",
     "variant": "Variant",
-    "chooseSeatOptional": "Välj plats nu (valfritt)",
     "seatChosen": "Plats {seat} vald – ändra",
     "summary": "Din beställning",
     "emptyCart": "Välj biljett eller mat så visas priset här.",
@@ -668,7 +676,10 @@
     "err_codeExhausted": "Rabattkoden är slutanvänd.",
     "err_rateLimited": "För många försök. Vänta en stund och försök igen.",
     "err_seatUnavailable": "Platsen hann bli upptagen. Välj en annan.",
-    "err_providerError": "Betalningen kunde inte startas. Inget har dragits – försök igen om en stund."
+    "err_providerError": "Betalningen kunde inte startas. Inget har dragits – försök igen om en stund.",
+    "chooseSeatRequired": "Välj plats (krävs)",
+    "seatRequiredHint": "Välj en plats på kartan för att kunna gå vidare till betalning.",
+    "err_seatRequired": "Du måste välja en plats innan du kan köpa en biljett med plats."
   },
   "food": {
     "back": "Till eventet",
@@ -1065,5 +1076,35 @@
     "emptyGroup": "Inga frågor i det här avsnittet.",
     "edit": "Redigera",
     "crewLink": "Hantera crew-jobb"
+  },
+  "sponsors": {
+    "title": "Våra sponsorer",
+    "tier_MAIN": "Huvudsponsor",
+    "tier_LARGE": "Stor sponsor",
+    "tier_REGULAR": "Sponsor"
+  },
+  "sponsorsManage": {
+    "title": "Sponsorer",
+    "lead": "Logotyperna visas längst ner på startsidan, grupperade efter nivå.",
+    "viewPage": "Visa startsidan",
+    "newSponsor": "Lägg till en sponsor",
+    "none": "Inga sponsorer än.",
+    "name": "Namn",
+    "tier": "Nivå",
+    "url": "Webbadress",
+    "urlHint": "Valfritt. Logotypen länkar dit.",
+    "logo": "Logotyp",
+    "newLogo": "Ny logotyp (valfritt)",
+    "logoHint": "PNG, JPG eller WebP, högst 5 MB. En bred logotyp med genomskinlig eller vit bakgrund fungerar bäst.",
+    "sortOrder": "Ordning",
+    "sortOrderHint": "Lägre tal visas först inom sin nivå.",
+    "isActive": "Visa på startsidan",
+    "save": "Spara sponsorn",
+    "create": "Lägg till sponsorn",
+    "delete": "Ta bort sponsorn",
+    "deleteConfirm": "Ta bort sponsorn och logotypen?",
+    "edit": "Redigera",
+    "active": "Visas",
+    "hidden": "Dold"
   }
 }

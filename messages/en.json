@@ -143,7 +143,8 @@
     "codeFormat": "The code must be 2–32 characters: letters, digits, - and _.",
     "percentInvalid": "Enter a whole number between 1 and 100.",
     "codeTaken": "A code with that name already exists for this event.",
-    "crewWhen": "Pick at least one time."
+    "crewWhen": "Pick at least one time.",
+    "urlInvalid": "Enter a web address starting with http:// or https://."
   },
   "messages": {
     "rateLimited": "Too many attempts. Please wait a while and try again.",
@@ -228,7 +229,10 @@
     "faqDeleted": "The question is deleted.",
     "faqMoved": "The order is changed.",
     "faqImported": "The built-in questions are imported and can now be edited.",
-    "faqAlreadyImported": "The questions are already imported."
+    "faqAlreadyImported": "The questions are already imported.",
+    "sponsorSaved": "The sponsor is saved.",
+    "sponsorDeleted": "The sponsor is deleted.",
+    "sponsorLogoRequired": "Choose a logo to upload."
   },
   "profile": {
     "title": "My profile",
@@ -376,7 +380,9 @@
     "removeImage": "Remove image",
     "imageAlt": "Image for {name}",
     "foodTitle": "Food",
-    "foodOrderBy": "order by {when}"
+    "foodOrderBy": "order by {when}",
+    "ticketsHeading": "Tickets",
+    "past": "Ended"
   },
   "manage": {
     "title": "Manage events",
@@ -403,7 +409,10 @@
     "checkinLink": "Check-in",
     "attendeesLink": "Attendees",
     "statsLink": "Statistics",
-    "broadcastLink": "Email attendees"
+    "broadcastLink": "Email attendees",
+    "crewLink": "Crew jobs",
+    "faqLink": "FAQ",
+    "sponsorsLink": "Sponsors"
   },
   "tickets": {
     "title": "Ticket types",
@@ -479,7 +488,7 @@
     "checkoutChosen": "You picked seat {seat}.",
     "checkoutHold": "The seat is held for you while you pay (30 minutes).",
     "checkoutClear": "Clear choice",
-    "checkoutPick": "Pick a free seat, or skip this and choose after buying."
+    "checkoutPick": "Choose a free seat on the map."
   },
   "editor": {
     "title": "Seating chart",
@@ -629,7 +638,6 @@
     "addFood": "Add food (optional)",
     "orderBy": "order by {when}",
     "variant": "Variant",
-    "chooseSeatOptional": "Choose a seat now (optional)",
     "seatChosen": "Seat {seat} chosen – change",
     "summary": "Your order",
     "emptyCart": "Choose a ticket or food and the price shows here.",
@@ -668,7 +676,10 @@
     "err_codeExhausted": "That discount code has been used up.",
     "err_rateLimited": "Too many attempts. Please wait a while and try again.",
     "err_seatUnavailable": "The seat was taken in the meantime. Pick another.",
-    "err_providerError": "The payment couldn't be started. Nothing was charged – please try again shortly."
+    "err_providerError": "The payment couldn't be started. Nothing was charged – please try again shortly.",
+    "chooseSeatRequired": "Choose a seat (required)",
+    "seatRequiredHint": "Pick a seat on the map to continue to payment.",
+    "err_seatRequired": "You have to choose a seat before you can buy a ticket with a seat."
   },
   "food": {
     "back": "Back to event",
@@ -1065,5 +1076,35 @@
     "emptyGroup": "No questions in this section.",
     "edit": "Edit",
     "crewLink": "Manage crew jobs"
+  },
+  "sponsors": {
+    "title": "Our sponsors",
+    "tier_MAIN": "Main sponsor",
+    "tier_LARGE": "Large sponsor",
+    "tier_REGULAR": "Sponsor"
+  },
+  "sponsorsManage": {
+    "title": "Sponsors",
+    "lead": "The logos are shown at the bottom of the landing page, grouped by tier.",
+    "viewPage": "View the landing page",
+    "newSponsor": "Add a sponsor",
+    "none": "No sponsors yet.",
+    "name": "Name",
+    "tier": "Tier",
+    "url": "Web address",
+    "urlHint": "Optional. The logo links there.",
+    "logo": "Logo",
+    "newLogo": "New logo (optional)",
+    "logoHint": "PNG, JPG or WebP, up to 5 MB. A wide logo with a transparent or white background works best.",
+    "sortOrder": "Order",
+    "sortOrderHint": "Lower numbers come first within their tier.",
+    "isActive": "Show on the landing page",
+    "save": "Save sponsor",
+    "create": "Add sponsor",
+    "delete": "Delete sponsor",
+    "deleteConfirm": "Delete the sponsor and its logo?",
+    "edit": "Edit",
+    "active": "Shown",
+    "hidden": "Hidden"
   }
 }

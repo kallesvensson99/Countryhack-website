@@ -52,3 +52,33 @@ export const crewApplicationSchema = z.object({
 export type FaqItemInput = z.output<typeof faqItemSchema>;
 export type CrewJobInput = z.output<typeof crewJobSchema>;
 export type CrewApplicationInput = z.output<typeof crewApplicationSchema>;
+
+export const SPONSOR_TIERS = ["MAIN", "LARGE", "REGULAR"] as const;
+
+/** Only plain http(s) links: the value ends up in an href. */
+const httpUrl = z
+  .string()
+  .trim()
+  .max(300, "validation.tooLong")
+  .default("")
+  .transform((s, ctx) => {
+    if (!s) return null;
+    try {
+      const u = new URL(s);
+      if (u.protocol === "http:" || u.protocol === "https:") return u.toString();
+    } catch {
+      /* falls through */
+    }
+    ctx.addIssue({ code: "custom", message: "validation.urlInvalid" });
+    return z.NEVER;
+  });
+
+export const sponsorSchema = z.object({
+  name: text(100),
+  tier: z.enum(SPONSOR_TIERS, "validation.required"),
+  url: httpUrl,
+  sortOrder: z.coerce.number().int().min(0).max(1000).default(0),
+  isActive: checkbox,
+});
+
+export type SponsorInput = z.output<typeof sponsorSchema>;

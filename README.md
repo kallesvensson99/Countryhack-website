@@ -171,6 +171,8 @@ docker compose -f docker-compose.prod.yml exec -T db pg_restore -U ccss -d ccss 
 
 See the stage summary in the conversation; the short version:
 
+- **Sponsors**: Festivalledare add sponsor logos at `/sv/manage/sponsors` (tier *Huvudsponsor*, *Stor sponsor* or *Sponsor*, optional link, show/hide, order). They appear at the bottom of the landing page, grouped by tier; the section is left out while there are none. Logos are PNG/JPG/WebP (max 5 MB) stored like event images.
+- **Seat is required**: a ticket type that includes a seat can only be bought together with a seat when the event has a seating chart (also free Crew tickets). Tickets without a seat and food-only orders are unaffected. The rule is enforced in `startCheckout` (the preview/price quote ignores it); `allowNoSeat` exists for tests only and is dropped by the server action's schema.
 - **Ansvarig** (tag) may post crew jobs and edit, close, delete and review applications for the jobs they posted themselves. Festivalledare manage every crew job and the FAQ. Applying needs a verified account (`/sv/crew/apply`); applications hold free text, so they are erased on account deletion and included in the data export.
 - Admin can view draft events but does **not** implicitly get Festivalledare's management rights (an admin can grant themselves the tag).
 - Email is not editable on the profile (avoids re-verification flows for now).

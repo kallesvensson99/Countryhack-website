@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { applyCrewAction, setApplicationStatusAction, saveCrewJobAction, withdrawCrewAction } from "@/actions/crew";
 import { moveFaqAction, saveFaqAction } from "@/actions/faq";
+import { saveSponsorAction } from "@/actions/sponsors";
 import type { ActionState } from "@/lib/validation/account";
 import { CheckboxField, Field, FormMessage, SubmitButton, TextAreaField } from "./form";
 
@@ -168,6 +169,46 @@ export function MoveFaq({ id, direction, label, disabled }: { id: string; direct
       <button type="submit" className="btn-secondary min-h-11 min-w-11 px-3" disabled={disabled} aria-label={label}>
         <span aria-hidden>{direction === "up" ? "↑" : "↓"}</span>
       </button>
+    </form>
+  );
+}
+
+export interface SponsorDefaults {
+  id?: string;
+  name?: string;
+  tier?: string;
+  url?: string;
+  sortOrder?: string;
+  isActive?: boolean;
+}
+
+/** Create (logo required) or edit (new logo optional) a sponsor. */
+export function SponsorForm({ tiers, defaults = {} }: { tiers: { value: string; label: string }[]; defaults?: SponsorDefaults }) {
+  const t = useTranslations("sponsorsManage");
+  const [state, action] = useActionState(saveSponsorAction, initial);
+  const uid = defaults.id ?? "new";
+  return (
+    <form action={action} className="space-y-4" noValidate>
+      <FormMessage state={state} />
+      {defaults.id && <input type="hidden" name="id" value={defaults.id} />}
+      <Field name="name" label={t("name")} state={state} required defaultValue={defaults.name} maxLength={100} />
+      <div>
+        <label htmlFor={`sp-tier-${uid}`} className="block text-sm font-medium">{t("tier")}</label>
+        <select id={`sp-tier-${uid}`} name="tier" className="input" defaultValue={state.values?.tier ?? defaults.tier ?? "REGULAR"}>
+          {tiers.map((x) => (
+            <option key={x.value} value={x.value}>{x.label}</option>
+          ))}
+        </select>
+      </div>
+      <Field name="url" label={t("url")} hint={t("urlHint")} type="url" state={state} optional defaultValue={defaults.url} maxLength={300} />
+      <div>
+        <label htmlFor={`sp-logo-${uid}`} className="block text-sm font-medium">{defaults.id ? t("newLogo") : t("logo")}</label>
+        <input id={`sp-logo-${uid}`} name="logo" type="file" accept="image/png,image/jpeg,image/webp" required={!defaults.id} className="mt-1 block w-full text-sm" aria-describedby={`sp-logo-hint-${uid}`} />
+        <p id={`sp-logo-hint-${uid}`} className="mt-1 text-sm text-slate-600">{t("logoHint")}</p>
+      </div>
+      <Field name="sortOrder" label={t("sortOrder")} hint={t("sortOrderHint")} state={state} defaultValue={defaults.sortOrder ?? "0"} inputMode="numeric" maxLength={4} />
+      <CheckboxField name="isActive" label={t("isActive")} state={state} defaultChecked={defaults.isActive ?? true} />
+      <SubmitButton>{defaults.id ? t("save") : t("create")}</SubmitButton>
     </form>
   );
 }

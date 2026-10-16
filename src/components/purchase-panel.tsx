@@ -58,6 +58,7 @@ export function PurchasePanel({ eventId, locale, mode, ticketTypes, food, seatMa
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
   const [foodSel, setFoodSel] = useState<Record<string, string>>({});
   const [seatId, setSeatId] = useState<string | null>(null);
+  const [mapOpen, setMapOpen] = useState(true); // the seat map starts open: a seat has to be chosen
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +113,8 @@ export function PurchasePanel({ eventId, locale, mode, ticketTypes, food, seatMa
   const hasLines = (preview?.lines.length ?? 0) > 0;
   const codeError = preview?.error && /err_code/.test(preview.error) ? preview.error : null;
   const blockingError = preview?.error && !codeError ? preview.error : null;
-  const canPay = hasLines && preview?.ok && !codeError && !busy && (mode === "food" || !!typeId);
+  const needsSeat = seatsAllowed && !seatId; // a seat ticket is only sold together with a seat
+  const canPay = hasLines && preview?.ok && !codeError && !busy && !needsSeat && (mode === "food" || !!typeId);
 
   const pay = async () => {
     setBusy(true);
@@ -218,8 +220,8 @@ export function PurchasePanel({ eventId, locale, mode, ticketTypes, food, seatMa
       )}
 
       {seatsAllowed && seatMap && (
-        <details className="rounded-md border border-slate-300 p-3">
-          <summary className="cursor-pointer font-semibold">{seatId ? t("seatChosen", { seat: seatMap.seats.find((s) => s.id === seatId)?.label ?? "" }) : t("chooseSeatOptional")}</summary>
+        <details open={mapOpen} onToggle={(e) => setMapOpen(e.currentTarget.open)} className="rounded-md border-2 border-ink p-3">
+          <summary className="cursor-pointer font-semibold">{seatId ? t("seatChosen", { seat: seatMap.seats.find((s) => s.id === seatId)?.label ?? "" }) : t("chooseSeatRequired")}</summary>
           <div className="mt-4">
             <SeatMap data={seatMap} viewer="member" checkout={{ allowedZoneIds: selected && selected.zoneIds.length ? selected.zoneIds : null, value: seatId, onChange: setSeatId }} />
           </div>
@@ -252,6 +254,7 @@ export function PurchasePanel({ eventId, locale, mode, ticketTypes, food, seatMa
 
       {blockingError && <p role="alert" className="rounded-md bg-red-50 p-3 text-sm font-medium text-red-900">{tAll(blockingError)}</p>}
       {error && <p role="alert" className="rounded-md bg-red-50 p-3 text-sm font-medium text-red-900">{tAll(error)}</p>}
+      {needsSeat && <p role="status" className="text-sm font-bold">{t("seatRequiredHint")}</p>}
       <button type="button" className="btn w-full sm:w-auto" disabled={!canPay} onClick={pay}>
         {busy ? tAll("auth.submitting") : preview && preview.totalOre === 0 && hasLines ? t("completeFree") : t("pay")}
       </button>

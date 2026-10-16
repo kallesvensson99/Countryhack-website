@@ -98,7 +98,7 @@ export async function shop() {
     return { user: u, actor: actorOf({ ...u, tags: [] }) };
   };
   const input = (over: Partial<Parameters<typeof import("@/lib/orders/checkout").startCheckout>[1]> = {}) => ({
-    eventId: event.id, ticketTypeId: types.std.id, seatId: null, discountCode: null, food: [], locale: "sv" as const, ...over,
+    eventId: event.id, ticketTypeId: types.std.id, seatId: null, discountCode: null, food: [], locale: "sv" as const, allowNoSeat: true, ...over,
   });
   return { fl, flUser, event, chart, std, vip, seats, types, meals, food, codes, buyer, input, next: () => ++n };
 }

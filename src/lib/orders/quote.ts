@@ -7,7 +7,7 @@ type Tx = Prisma.TransactionClient;
 export type QuoteError =
   | "eventNotOpen" | "registrationClosed" | "emptyCart"
   | "ticketTypeInvalid" | "ticketNotOnSale" | "soldOut" | "needsCode" | "alreadyHasTicket" | "tooYoung"
-  | "seatNeedsTicket" | "seatInvalid"
+  | "seatNeedsTicket" | "seatInvalid" | "seatRequired"
   | "noTicketForFood" | "foodInvalid" | "foodNotOnSale" | "foodSoldOut" | "foodDuplicate"
   | "codeUnknown" | "codeNotYetValid" | "codeExpired" | "codeExhausted";
 
@@ -54,7 +54,7 @@ const bad = (reason: QuoteError, detail?: string): QuoteResult => ({ ok: false, 
  * preview (plain client) and inside the checkout transaction (after row locks), so both agree.
  * PENDING tickets/food of this same member are ignored: starting a new checkout replaces them.
  */
-export async function buildQuote(tx: Tx, userId: string, input: QuoteInput, opts: { now?: Date; allowEmpty?: boolean } = {}): Promise<QuoteResult> {
+export async function buildQuote(tx: Tx, userId: string, input: QuoteInput, opts: { now?: Date; allowEmpty?: boolean; requireSeat?: boolean } = {}): Promise<QuoteResult> {
   const now = opts.now ?? new Date();
   const event = await tx.event.findUnique({ where: { id: input.eventId }, include: { chart: { select: { id: true } } } });
   if (!event || event.status !== "PUBLISHED") return bad("eventNotOpen");
@@ -94,6 +94,8 @@ export async function buildQuote(tx: Tx, userId: string, input: QuoteInput, opts
     const sold = await tx.ticket.count({ where: { ticketTypeId: ticketType.id, status: { not: "CANCELLED" }, userId: { not: userId } } });
     if (sold >= ticketType.quantity) return bad("soldOut");
 
+    // A ticket with a seat is only sold together with the seat (when the event has a seating chart).
+    if (!input.seatId && opts.requireSeat && ticketType.includesSeat && event.chart) return bad("seatRequired");
     if (input.seatId) {
       if (!ticketType.includesSeat) return bad("seatNeedsTicket");
       const seat = await tx.seat.findFirst({ where: { id: input.seatId, chartId: event.chart?.id ?? "-" } });

@@ -14,6 +14,8 @@ import { buildQuote, type Quote, type QuoteError, type QuoteInput, type QuoteRes
 
 export interface CheckoutInput extends QuoteInput {
   locale: "sv" | "en";
+  /** Skip the "a seat must be chosen" rule. Never set by the UI or the server action (their schema drops it); for tests and tooling. */
+  allowNoSeat?: boolean;
 }
 
 export type CheckoutError = QuoteError | "rateLimited" | "seatUnavailable" | "providerError";
@@ -64,7 +66,7 @@ export async function startCheckout(actor: Actor, input: CheckoutInput, opts: { 
         await tx.$queryRaw`SELECT 1 FROM "DiscountCode" WHERE "eventId" = ${input.eventId} AND lower("code") = lower(${input.discountCode.trim()}) FOR UPDATE`;
       }
 
-      const q = await buildQuote(tx, actor.id, input, { now });
+      const q = await buildQuote(tx, actor.id, input, { now, requireSeat: !input.allowNoSeat });
       if (!q.ok) throw new Abort({ ok: false, reason: q.reason, detail: q.detail });
       const quote = q.quote;
       const expiresAt = new Date(now.getTime() + env().SEAT_HOLD_MINUTES * 60_000);

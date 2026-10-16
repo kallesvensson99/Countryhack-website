@@ -56,6 +56,7 @@ export const ACTIONS = {
   "order:refund": "festivalledare",
   "broadcast:send": "festivalledare",
   "faq:manage": "festivalledare",
+  "sponsor:manage": "festivalledare",
   // Crew jobs: Ansvarig may create and then manage their own; Festivalledare manage all
   "crewJob:create": "crewStaff",
   "crewJob:edit": "crewOwnerOrLeader", // resource.ownerId = the job's creator; also covers viewing its applications

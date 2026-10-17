@@ -43,6 +43,7 @@ const allow: Record<Action, Role[]> = {
   "crewApplication:create": ["member", "ansvarig", "festivalledare", "admin", "both"],
   "faq:manage": ["festivalledare", "both"],
   "sponsor:manage": ["festivalledare", "both"],
+  "association:manage": ["festivalledare", "both"],
   "crewJob:create": ["festivalledare", "ansvarig", "both"],
   "crewJob:edit": ["festivalledare", "both"], // Ansvarig only for their own jobs (tested below)
   "user:manage": ["admin", "both"],

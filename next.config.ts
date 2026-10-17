@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
   // The e2e tests build into their own folder, so they never clobber the cache of a running `next dev`.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   poweredByHeader: false,
-  experimental: { serverActions: { bodySizeLimit: "6mb" } }, // event image uploads (max 5 MB)
+  experimental: { serverActions: { bodySizeLimit: "16mb" } }, // uploads: images (max 5 MB) and association documents (max 15 MB)
   serverExternalPackages: ["@node-rs/argon2"],
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

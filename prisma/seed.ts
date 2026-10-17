@@ -34,6 +34,17 @@ async function main() {
   // a contact address so the FAQ and crew pages have something to show in development
   if (!settings.contactEmail) await db.orgSettings.update({ where: { id: settings.id }, data: { contactEmail: "info@ccss.test" } });
 
+  // a starting text for the association page (editable by Festivalledare in the app)
+  if (!settings.aboutIntroSv) {
+    await db.orgSettings.update({
+      where: { id: settings.id },
+      data: {
+        aboutIntroSv: "Cable connectors spelsällskap är en ideell förening för människor som gillar att spela tillsammans. Vi arrangerar Countryhack och andra LAN på ideell basis.\n\nHär hittar du vilka som sitter i styrelsen och våra dokument, till exempel mötesprotokoll.",
+        aboutIntroEn: "Cable connectors spelsällskap is a non-profit association for people who like to play together. We run Countryhack and other LANs on a voluntary basis.\n\nHere you can see who is on the board and find our documents, such as meeting minutes.",
+      },
+    });
+  }
+
   const passwordHash = await hashPassword(SEED_PASSWORD);
   for (const u of users) {
     const user = await db.user.upsert({

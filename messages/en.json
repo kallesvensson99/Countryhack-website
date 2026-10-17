@@ -34,7 +34,8 @@
     "faq": "FAQ",
     "crew": "Join the crew",
     "manageCrew": "Manage crew",
-    "manageFaq": "Edit FAQ"
+    "manageFaq": "Edit FAQ",
+    "association": "The association"
   },
   "home": {
     "title": "LAN parties with Cable connectors gaming society",
@@ -144,7 +145,8 @@
     "percentInvalid": "Enter a whole number between 1 and 100.",
     "codeTaken": "A code with that name already exists for this event.",
     "crewWhen": "Pick at least one time.",
-    "urlInvalid": "Enter a web address starting with http:// or https://."
+    "urlInvalid": "Enter a web address starting with http:// or https://.",
+    "docDateInvalid": "Enter a valid date."
   },
   "messages": {
     "rateLimited": "Too many attempts. Please wait a while and try again.",
@@ -232,7 +234,15 @@
     "faqAlreadyImported": "The questions are already imported.",
     "sponsorSaved": "The sponsor is saved.",
     "sponsorDeleted": "The sponsor is deleted.",
-    "sponsorLogoRequired": "Choose a logo to upload."
+    "sponsorLogoRequired": "Choose a logo to upload.",
+    "aboutIntroSaved": "The introduction is saved.",
+    "boardSaved": "The board member is saved.",
+    "boardDeleted": "The board member is deleted.",
+    "docSaved": "The document is saved.",
+    "docDeleted": "The document is deleted.",
+    "docBadFile": "The file must be a PDF or a Word, Excel, PowerPoint or OpenDocument file.",
+    "docTooLarge": "The file is too large. 15 MB at most.",
+    "docFileRequired": "Choose a file to upload."
   },
   "profile": {
     "title": "My profile",
@@ -412,7 +422,8 @@
     "broadcastLink": "Email attendees",
     "crewLink": "Crew jobs",
     "faqLink": "FAQ",
-    "sponsorsLink": "Sponsors"
+    "sponsorsLink": "Sponsors",
+    "associationLink": "Association page"
   },
   "tickets": {
     "title": "Ticket types",
@@ -1106,5 +1117,66 @@
     "edit": "Edit",
     "active": "Shown",
     "hidden": "Hidden"
+  },
+  "association": {
+    "eyebrow": "about us",
+    "title": "The association",
+    "edit": "Edit the page",
+    "noIntroStaff": "No introduction is written yet. Add one under Edit the page.",
+    "boardTitle": "The board",
+    "noBoard": "The board has not been added yet.",
+    "docsTitle": "Documents",
+    "noDocs": "No documents yet.",
+    "category_MINUTES": "Meeting minutes",
+    "category_BYLAWS": "Bylaws",
+    "category_REPORT": "Annual reports",
+    "category_OTHER": "Other",
+    "visibility_PUBLIC": "Everyone",
+    "visibility_LOGGED_IN": "Logged in",
+    "visibility_STAFF": "Festivalledare only",
+    "moreWhenLoggedIn": "More documents are available to logged-in users.",
+    "login": "Log in"
+  },
+  "associationManage": {
+    "title": "Association page",
+    "lead": "The introduction, board members and documents shown on the Association page.",
+    "viewPage": "View the page",
+    "introTitle": "Introduction",
+    "introSv": "Introduction (Swedish)",
+    "introEn": "Introduction (English)",
+    "englishHint": "English is optional. If left empty, the Swedish text is shown.",
+    "introHint": "Write plain text. Line breaks and blank lines are kept.",
+    "saveIntro": "Save introduction",
+    "boardTitle": "Board members",
+    "newMember": "Add a board member",
+    "noMembers": "No board members yet.",
+    "memberName": "Name",
+    "memberRole": "Role",
+    "memberRoleHint": "For example Chair, Treasurer or Member (in Swedish).",
+    "memberRoleEn": "Role (English)",
+    "memberEmail": "Email",
+    "memberEmailHint": "Optional. Shown publicly on the page.",
+    "sortOrder": "Order",
+    "sortOrderHint": "Lower numbers come first.",
+    "saveMember": "Save member",
+    "addMember": "Add member",
+    "deleteMember": "Delete member",
+    "deleteMemberConfirm": "Delete the board member?",
+    "edit": "Edit",
+    "docsTitle": "Documents",
+    "newDoc": "Upload a document",
+    "noDocs": "No documents yet.",
+    "docTitle": "Title",
+    "docCategory": "Type",
+    "docDate": "Date",
+    "docDateHint": "Optional, for example the meeting date.",
+    "docVisibility": "Who may see the document?",
+    "docVisibilityHint": "Everyone = also visitors who are not logged in. Logged in = anyone with an account. Festivalledare only = just Festivalledare.",
+    "docFile": "File",
+    "docFileHint": "PDF, Word, Excel, PowerPoint or OpenDocument, 15 MB at most.",
+    "uploadDoc": "Upload document",
+    "saveDoc": "Save details",
+    "deleteDoc": "Delete document",
+    "deleteDocConfirm": "Delete the document and its file?"
   }
 }

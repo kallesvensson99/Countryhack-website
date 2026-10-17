@@ -2,8 +2,11 @@
 {$SITE_DOMAIN} {
 	encode zstd gzip
 
-	# Uploaded event images are served straight from the volume.
-	handle_path /uploads/* {
+	# Uploaded event images and sponsor logos are served straight from the volume.
+	# Association documents (uploads/documents) are deliberately NOT: they go through the app, which checks who may see them.
+	@images path /uploads/events/* /uploads/sponsors/*
+	handle @images {
+		uri strip_prefix /uploads
 		root * /srv/uploads
 		file_server
 	}

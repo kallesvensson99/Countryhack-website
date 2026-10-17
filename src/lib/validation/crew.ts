@@ -82,3 +82,56 @@ export const sponsorSchema = z.object({
 });
 
 export type SponsorInput = z.output<typeof sponsorSchema>;
+
+// ───────────── Association page ─────────────
+
+export const DOC_CATEGORIES = ["MINUTES", "BYLAWS", "REPORT", "OTHER"] as const;
+export const DOC_VISIBILITIES = ["PUBLIC", "LOGGED_IN", "STAFF"] as const;
+
+export const aboutIntroSchema = z.object({
+  aboutIntroSv: z.string().trim().max(5000, "validation.tooLong").default(""),
+  aboutIntroEn: z.string().trim().max(5000, "validation.tooLong").default(""),
+});
+
+export const boardMemberSchema = z.object({
+  name: text(100),
+  role: text(100),
+  roleEn: optionalText(100),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(254, "validation.tooLong")
+    .default("")
+    .transform((s, ctx) => {
+      if (!s) return null;
+      if (z.email().safeParse(s).success) return s;
+      ctx.addIssue({ code: "custom", message: "validation.emailInvalid" });
+      return z.NEVER;
+    }),
+  sortOrder: z.coerce.number().int().min(0).max(1000).default(0),
+});
+
+export const documentSchema = z.object({
+  title: text(150),
+  category: z.enum(DOC_CATEGORIES, "validation.required"),
+  visibility: z.enum(DOC_VISIBILITIES, "validation.required"),
+  /** yyyy-mm-dd from <input type="date">, optional */
+  docDate: z
+    .string()
+    .trim()
+    .default("")
+    .transform((s, ctx) => {
+      if (!s) return null;
+      const d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? new Date(`${s}T00:00:00.000Z`) : null;
+      if (!d || Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== s) {
+        ctx.addIssue({ code: "custom", message: "validation.docDateInvalid" });
+        return z.NEVER;
+      }
+      return d;
+    }),
+});
+
+export type AboutIntroInput = z.output<typeof aboutIntroSchema>;
+export type BoardMemberInput = z.output<typeof boardMemberSchema>;
+export type DocumentInput = z.output<typeof documentSchema>;

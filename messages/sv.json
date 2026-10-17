@@ -34,7 +34,8 @@
     "faq": "Vanliga frågor",
     "crew": "Bli crew",
     "manageCrew": "Hantera crew",
-    "manageFaq": "Redigera frågor"
+    "manageFaq": "Redigera frågor",
+    "association": "Föreningen"
   },
   "home": {
     "title": "LAN-party med Cable connectors spelsällskap",
@@ -144,7 +145,8 @@
     "percentInvalid": "Ange ett heltal mellan 1 och 100.",
     "codeTaken": "Det finns redan en kod med det namnet på eventet.",
     "crewWhen": "Välj minst en tidpunkt.",
-    "urlInvalid": "Skriv en webbadress som börjar med http:// eller https://."
+    "urlInvalid": "Skriv en webbadress som börjar med http:// eller https://.",
+    "docDateInvalid": "Ange ett giltigt datum."
   },
   "messages": {
     "rateLimited": "För många försök. Vänta en stund och försök igen.",
@@ -232,7 +234,15 @@
     "faqAlreadyImported": "Frågorna är redan importerade.",
     "sponsorSaved": "Sponsorn är sparad.",
     "sponsorDeleted": "Sponsorn är borttagen.",
-    "sponsorLogoRequired": "Välj en logotyp att ladda upp."
+    "sponsorLogoRequired": "Välj en logotyp att ladda upp.",
+    "aboutIntroSaved": "Inledningen är sparad.",
+    "boardSaved": "Styrelseledamoten är sparad.",
+    "boardDeleted": "Styrelseledamoten är borttagen.",
+    "docSaved": "Dokumentet är sparat.",
+    "docDeleted": "Dokumentet är borttaget.",
+    "docBadFile": "Filen måste vara en PDF eller ett Word-, Excel-, PowerPoint- eller OpenDocument-dokument.",
+    "docTooLarge": "Filen är för stor. Högst 15 MB.",
+    "docFileRequired": "Välj en fil att ladda upp."
   },
   "profile": {
     "title": "Min profil",
@@ -412,7 +422,8 @@
     "broadcastLink": "Mejla deltagare",
     "crewLink": "Crew-jobb",
     "faqLink": "Vanliga frågor",
-    "sponsorsLink": "Sponsorer"
+    "sponsorsLink": "Sponsorer",
+    "associationLink": "Föreningssidan"
   },
   "tickets": {
     "title": "Biljettyper",
@@ -1106,5 +1117,66 @@
     "edit": "Redigera",
     "active": "Visas",
     "hidden": "Dold"
+  },
+  "association": {
+    "eyebrow": "om föreningen",
+    "title": "Föreningen",
+    "edit": "Redigera sidan",
+    "noIntroStaff": "Ingen inledning är skriven än. Lägg till en under Redigera sidan.",
+    "boardTitle": "Styrelsen",
+    "noBoard": "Styrelsen är inte inlagd än.",
+    "docsTitle": "Dokument",
+    "noDocs": "Inga dokument ännu.",
+    "category_MINUTES": "Mötesprotokoll",
+    "category_BYLAWS": "Stadgar",
+    "category_REPORT": "Verksamhetsberättelser och rapporter",
+    "category_OTHER": "Övrigt",
+    "visibility_PUBLIC": "Alla",
+    "visibility_LOGGED_IN": "Inloggade",
+    "visibility_STAFF": "Endast festivalledare",
+    "moreWhenLoggedIn": "Fler dokument finns för inloggade användare.",
+    "login": "Logga in"
+  },
+  "associationManage": {
+    "title": "Föreningssidan",
+    "lead": "Inledning, styrelseledamöter och dokument som visas på sidan Föreningen.",
+    "viewPage": "Visa sidan",
+    "introTitle": "Inledning",
+    "introSv": "Inledning (svenska)",
+    "introEn": "Inledning (engelska)",
+    "englishHint": "Engelska är valfritt. Lämnas det tomt visas den svenska texten.",
+    "introHint": "Skriv vanlig text. Radbrytningar och blankrader behålls.",
+    "saveIntro": "Spara inledningen",
+    "boardTitle": "Styrelseledamöter",
+    "newMember": "Lägg till en styrelseledamot",
+    "noMembers": "Inga styrelseledamöter än.",
+    "memberName": "Namn",
+    "memberRole": "Roll",
+    "memberRoleHint": "Till exempel Ordförande, Kassör eller Ledamot.",
+    "memberRoleEn": "Roll (engelska)",
+    "memberEmail": "E-post",
+    "memberEmailHint": "Valfritt. Visas offentligt på sidan.",
+    "sortOrder": "Ordning",
+    "sortOrderHint": "Lägre tal visas först.",
+    "saveMember": "Spara ledamoten",
+    "addMember": "Lägg till ledamoten",
+    "deleteMember": "Ta bort ledamoten",
+    "deleteMemberConfirm": "Ta bort styrelseledamoten?",
+    "edit": "Redigera",
+    "docsTitle": "Dokument",
+    "newDoc": "Ladda upp ett dokument",
+    "noDocs": "Inga dokument än.",
+    "docTitle": "Titel",
+    "docCategory": "Typ",
+    "docDate": "Datum",
+    "docDateHint": "Valfritt, till exempel mötesdatum.",
+    "docVisibility": "Vem får se dokumentet?",
+    "docVisibilityHint": "Alla = även besökare som inte är inloggade. Inloggade = alla med ett konto. Endast festivalledare = bara festivalledare.",
+    "docFile": "Fil",
+    "docFileHint": "PDF, Word, Excel, PowerPoint eller OpenDocument, högst 15 MB.",
+    "uploadDoc": "Ladda upp dokumentet",
+    "saveDoc": "Spara uppgifterna",
+    "deleteDoc": "Ta bort dokumentet",
+    "deleteDocConfirm": "Ta bort dokumentet och filen?"
   }
 }

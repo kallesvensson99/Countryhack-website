@@ -248,6 +248,8 @@ model OrgSettings {
   address              String?
   contactEmail         String?
   privacyPolicyVersion String   @default("1")
+  aboutIntroSv         String   @default("") // editable intro on the association page
+  aboutIntroEn         String   @default("")
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 }
@@ -763,4 +765,49 @@ model Sponsor {
   updatedAt DateTime    @updatedAt
 
   @@index([tier, sortOrder])
+}
+
+enum DocCategory {
+  MINUTES // mötesprotokoll
+  BYLAWS // stadgar
+  REPORT // verksamhetsberättelse, årsredovisning
+  OTHER
+}
+
+enum DocVisibility {
+  PUBLIC // everyone
+  LOGGED_IN // anyone with an account who is logged in
+  STAFF // Festivalledare only
+}
+
+/// A file on the association page (meeting minutes etc). The bytes live in private storage and are
+/// only handed out through /api/documents/<id>, which checks `visibility`.
+model AssociationDocument {
+  id           String        @id @default(cuid())
+  title        String
+  category     DocCategory
+  docDate      DateTime?     @db.Date // e.g. the date of the meeting
+  visibility   DocVisibility @default(LOGGED_IN)
+  storageKey   String // "documents/<hex>.<ext>"
+  fileName     String // the uploaded name, shown and used for the download
+  contentType  String
+  sizeBytes    Int
+  uploadedById String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([category, docDate])
+}
+
+model BoardMember {
+  id        String   @id @default(cuid())
+  name      String
+  role      String // e.g. "Ordförande"
+  roleEn    String   @default("")
+  email     String? // optional, shown publicly
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
 }

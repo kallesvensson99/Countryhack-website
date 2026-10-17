@@ -35,7 +35,8 @@
     "crew": "Bli crew",
     "manageCrew": "Hantera crew",
     "manageFaq": "Redigera frågor",
-    "association": "Föreningen"
+    "association": "Föreningen",
+    "news": "Nyheter"
   },
   "home": {
     "title": "LAN-party med Cable connectors spelsällskap",
@@ -242,7 +243,9 @@
     "docDeleted": "Dokumentet är borttaget.",
     "docBadFile": "Filen måste vara en PDF eller ett Word-, Excel-, PowerPoint- eller OpenDocument-dokument.",
     "docTooLarge": "Filen är för stor. Högst 15 MB.",
-    "docFileRequired": "Välj en fil att ladda upp."
+    "docFileRequired": "Välj en fil att ladda upp.",
+    "newsSaved": "Nyheten är sparad.",
+    "newsDeleted": "Nyheten är borttagen."
   },
   "profile": {
     "title": "Min profil",
@@ -423,7 +426,8 @@
     "crewLink": "Crew-jobb",
     "faqLink": "Vanliga frågor",
     "sponsorsLink": "Sponsorer",
-    "associationLink": "Föreningssidan"
+    "associationLink": "Föreningssidan",
+    "newsLink": "Nyheter"
   },
   "tickets": {
     "title": "Biljettyper",
@@ -1178,5 +1182,50 @@
     "saveDoc": "Spara uppgifterna",
     "deleteDoc": "Ta bort dokumentet",
     "deleteDocConfirm": "Ta bort dokumentet och filen?"
+  },
+  "news": {
+    "title": "Nyheter",
+    "lead": "Det senaste från föreningen och Countryhack.",
+    "none": "Inga nyheter ännu.",
+    "readMore": "Läs mer",
+    "back": "Tillbaka till nyheter",
+    "all": "Alla nyheter",
+    "latest": "Senaste nytt",
+    "manage": "Hantera nyheter",
+    "pages": "Sidor",
+    "pageOf": "Sida {page} av {total}",
+    "newer": "Nyare",
+    "older": "Äldre",
+    "draftNote": "Det här är ett utkast. Bara festivalledare ser det.",
+    "scheduledNote": "Den här nyheten publiceras {when}. Tills dess ser bara festivalledare den."
+  },
+  "newsManage": {
+    "title": "Nyheter",
+    "lead": "Skriv, publicera och ta bort nyheter. De visas på startsidan och under fliken Nyheter.",
+    "viewPage": "Visa nyheterna",
+    "newPost": "Skriv en nyhet",
+    "none": "Inga nyheter än.",
+    "postTitle": "Rubrik (svenska)",
+    "body": "Text (svenska)",
+    "bodyHint": "Skriv vanlig text. Blankrader skapar nya stycken. Första stycket visas som sammanfattning i listorna.",
+    "postTitleEn": "Rubrik (engelska)",
+    "bodyEn": "Text (engelska)",
+    "englishHint": "Engelska är valfritt. Lämnas det tomt visas den svenska texten.",
+    "image": "Bild",
+    "newImage": "Ny bild (valfritt)",
+    "imageHint": "Valfritt. PNG, JPG eller WebP, högst 5 MB.",
+    "removeImage": "Ta bort den nuvarande bilden",
+    "published": "Publicerad",
+    "publishedHint": "Avmarkerat sparas nyheten som ett utkast som bara festivalledare ser.",
+    "publishedAt": "Publiceringstid",
+    "publishedAtHint": "Valfritt. Tom = nu. En tid i framtiden schemalägger nyheten.",
+    "save": "Spara nyheten",
+    "create": "Spara nyheten",
+    "delete": "Ta bort nyheten",
+    "deleteConfirm": "Ta bort nyheten?",
+    "edit": "Redigera",
+    "statusLive": "Publicerad",
+    "statusScheduled": "Schemalagd",
+    "statusDraft": "Utkast"
   }
 }

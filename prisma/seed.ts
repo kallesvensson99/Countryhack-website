@@ -34,6 +34,20 @@ async function main() {
   // a contact address so the FAQ and crew pages have something to show in development
   if (!settings.contactEmail) await db.orgSettings.update({ where: { id: settings.id }, data: { contactEmail: "info@ccss.test" } });
 
+  // one news post so the news section is visible in development (editable in the app)
+  if ((await db.newsPost.count()) === 0) {
+    await db.newsPost.create({
+      data: {
+        slug: "valkommen-till-countryhack",
+        title: "Välkommen till Countryhack",
+        titleEn: "Welcome to Countryhack",
+        body: "Biljetterna till Countryhack är släppta! Välj din biljett och din plats vid ett bord direkt på sidan.\n\nFölj nyheterna här för information inför eventet.",
+        bodyEn: "Tickets for Countryhack are out! Pick your ticket and your seat at a table right on the site.\n\nFollow the news here for information ahead of the event.",
+        publishedAt: new Date(),
+      },
+    });
+  }
+
   // a starting text for the association page (editable by Festivalledare in the app)
   if (!settings.aboutIntroSv) {
     await db.orgSettings.update({

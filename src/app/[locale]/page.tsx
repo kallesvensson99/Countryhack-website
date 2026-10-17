@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { HeroScene } from "@/components/hero-scene";
+import { NewsCard } from "@/components/news-card";
 import { SeatMap } from "@/components/seat-map";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getOrgSettings } from "@/lib/auth/service";
@@ -10,6 +11,7 @@ import { formatSek } from "@/lib/money";
 import { jsonLd } from "@/lib/seo";
 import { env } from "@/lib/env";
 import { stockholmParts } from "@/lib/age";
+import { listPublishedNews } from "@/lib/news/service";
 import { getSeatMap } from "@/lib/seating/booking";
 
 const sameDay = (a: Date, b: Date) => JSON.stringify(stockholmParts(a)) === JSON.stringify(stockholmParts(b));
@@ -36,6 +38,8 @@ export default async function HomePage({ params, searchParams }: { params: Promi
   const sold = next ? await soldByType(next.id) : new Map<string, number>();
   const seats = next ? await seatAvailability(next.id, now) : null;
   const seatMap = next ? await getSeatMap(next.id, user) : null;
+  const latestNews = await listPublishedNews({ limit: 3, now });
+  const tn = await getTranslations("news");
 
   const when = (d: Date) => f.dateTime(d, { dateStyle: "long", timeStyle: "short" });
   const day = (d: Date) => f.dateTime(d, { dateStyle: "long" });
@@ -192,6 +196,24 @@ export default async function HomePage({ params, searchParams }: { params: Promi
           <p className="text-lg">{t("lead")}</p>
           <p role="status" className="rounded-md bg-night-2 p-3">{t("noEvents")}</p>
           {!user && <Link href="/register" className="btn">{t("cta")}</Link>}
+        </section>
+      )}
+
+      {latestNews.length > 0 && (
+        <section aria-labelledby="news-h" className="space-y-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 id="news-h" className="disp text-4xl sm:text-5xl">{tn("latest")}</h2>
+            <Link href="/nyheter" className="btn-secondary">{tn("all")}</Link>
+          </div>
+          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {latestNews.map((p) => (
+              <li key={p.id} className="flex">
+                <div className="w-full">
+                  <NewsCard post={p} locale={locale} />
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

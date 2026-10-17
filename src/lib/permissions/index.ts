@@ -57,6 +57,7 @@ export const ACTIONS = {
   "broadcast:send": "festivalledare",
   "faq:manage": "festivalledare",
   "sponsor:manage": "festivalledare",
+  "news:manage": "festivalledare", // write, publish and delete news posts (drafts are visible to them too)
   "association:manage": "festivalledare", // intro, board members and documents on the association page
   // Crew jobs: Ansvarig may create and then manage their own; Festivalledare manage all
   "crewJob:create": "crewStaff",

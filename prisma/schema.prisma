@@ -811,3 +811,21 @@ model BoardMember {
 
   @@index([sortOrder])
 }
+
+/// A news post. Visible to everyone when `publishedAt` is set and not in the future; otherwise a draft
+/// (or scheduled) that only Festivalledare can see. English text is optional (empty = fall back to Swedish).
+model NewsPost {
+  id            String    @id @default(cuid())
+  slug          String    @unique
+  title         String
+  titleEn       String    @default("")
+  body          String
+  bodyEn        String    @default("")
+  imagePath     String? // "/uploads/news/<hex>.<ext>"
+  publishedAt   DateTime?
+  createdById   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([publishedAt])
+}

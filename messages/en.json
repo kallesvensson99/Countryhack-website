@@ -35,7 +35,8 @@
     "crew": "Join the crew",
     "manageCrew": "Manage crew",
     "manageFaq": "Edit FAQ",
-    "association": "The association"
+    "association": "The association",
+    "news": "News"
   },
   "home": {
     "title": "LAN parties with Cable connectors gaming society",
@@ -242,7 +243,9 @@
     "docDeleted": "The document is deleted.",
     "docBadFile": "The file must be a PDF or a Word, Excel, PowerPoint or OpenDocument file.",
     "docTooLarge": "The file is too large. 15 MB at most.",
-    "docFileRequired": "Choose a file to upload."
+    "docFileRequired": "Choose a file to upload.",
+    "newsSaved": "The news post is saved.",
+    "newsDeleted": "The news post is deleted."
   },
   "profile": {
     "title": "My profile",
@@ -423,7 +426,8 @@
     "crewLink": "Crew jobs",
     "faqLink": "FAQ",
     "sponsorsLink": "Sponsors",
-    "associationLink": "Association page"
+    "associationLink": "Association page",
+    "newsLink": "News"
   },
   "tickets": {
     "title": "Ticket types",
@@ -1178,5 +1182,50 @@
     "saveDoc": "Save details",
     "deleteDoc": "Delete document",
     "deleteDocConfirm": "Delete the document and its file?"
+  },
+  "news": {
+    "title": "News",
+    "lead": "The latest from the association and Countryhack.",
+    "none": "No news yet.",
+    "readMore": "Read more",
+    "back": "Back to news",
+    "all": "All news",
+    "latest": "Latest news",
+    "manage": "Manage news",
+    "pages": "Pages",
+    "pageOf": "Page {page} of {total}",
+    "newer": "Newer",
+    "older": "Older",
+    "draftNote": "This is a draft. Only Festivalledare can see it.",
+    "scheduledNote": "This post will be published {when}. Until then only Festivalledare can see it."
+  },
+  "newsManage": {
+    "title": "News",
+    "lead": "Write, publish and delete news. They are shown on the landing page and under the News tab.",
+    "viewPage": "View the news",
+    "newPost": "Write a news post",
+    "none": "No news yet.",
+    "postTitle": "Headline (Swedish)",
+    "body": "Text (Swedish)",
+    "bodyHint": "Write plain text. Blank lines make new paragraphs. The first paragraph is shown as the summary in the lists.",
+    "postTitleEn": "Headline (English)",
+    "bodyEn": "Text (English)",
+    "englishHint": "English is optional. If left empty, the Swedish text is shown.",
+    "image": "Picture",
+    "newImage": "New picture (optional)",
+    "imageHint": "Optional. PNG, JPG or WebP, up to 5 MB.",
+    "removeImage": "Remove the current picture",
+    "published": "Published",
+    "publishedHint": "If unticked the post is saved as a draft that only Festivalledare can see.",
+    "publishedAt": "Publish time",
+    "publishedAtHint": "Optional. Empty = now. A time in the future schedules the post.",
+    "save": "Save post",
+    "create": "Save post",
+    "delete": "Delete post",
+    "deleteConfirm": "Delete the news post?",
+    "edit": "Edit",
+    "statusLive": "Published",
+    "statusScheduled": "Scheduled",
+    "statusDraft": "Draft"
   }
 }

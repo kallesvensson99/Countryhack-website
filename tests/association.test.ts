@@ -37,16 +37,17 @@ beforeEach(async () => {
 const leader = async () => asActor(await makeUser({ tags: ["FESTIVALLEDARE"] }));
 
 describe("who may edit the association page", () => {
-  it("only Festivalledare", async () => {
+  it("Festivalledare and Admin; not Ansvarig or members", async () => {
     const fl = await leader();
     expect((await createBoardMember(fl, member())).ok).toBe(true);
-    for (const tags of [["ANSVARIG"], ["ADMIN"], []] as const) {
+    expect((await createBoardMember(asActor(await makeUser({ tags: ["ADMIN"] })), member())).ok).toBe(true);
+    for (const tags of [["ANSVARIG"], []] as const) {
       const who = asActor(await makeUser({ tags: [...tags] }));
       await expect(createBoardMember(who, member())).rejects.toBeInstanceOf(ForbiddenError);
       await expect(updateAboutIntro(who, aboutIntroSchema.parse({ aboutIntroSv: "x" }))).rejects.toBeInstanceOf(ForbiddenError);
       await expect(uploadDocument(who, doc(), { name: "a.pdf", data: pdf })).rejects.toBeInstanceOf(ForbiddenError);
     }
-    expect(await db.boardMember.count()).toBe(1);
+    expect(await db.boardMember.count()).toBe(2);
     expect(await db.associationDocument.count()).toBe(0);
   });
 });
@@ -197,7 +198,7 @@ describe("who may see and download a document", () => {
     expect(await names(member)).toEqual(["Inloggade", "Offentligt"]);
     expect((await listDocumentsFor(member)).hidden).toBe(1);
     expect(await names(fl)).toEqual(["Inloggade", "Ledare", "Offentligt"]);
-    expect(await names(asActor(await makeUser({ tags: ["ADMIN"] })))).toEqual(["Inloggade", "Offentligt"]); // Admin has no implicit staff rights
+    expect(await names(asActor(await makeUser({ tags: ["ADMIN"] })))).toEqual(["Inloggade", "Ledare", "Offentligt"]); // an Admin holds every right, staff documents included
   });
 
   it("downloads are enforced per document; a hidden one looks exactly like a missing one", async () => {

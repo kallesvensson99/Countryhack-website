@@ -102,12 +102,13 @@ describe("creating and editing events", () => {
     expect(log).toMatchObject({ actorId: fl.id, eventId: a.id, ip: "1.1.1.1" });
   });
 
-  it("is forbidden for members and for admins without the Festivalledare tag", async () => {
+  it("is forbidden for members; an Admin may create events too", async () => {
     const member = asActor(await makeUser());
     const admin = asActor(await makeUser({ tags: ["ADMIN"] }));
     await expect(createEvent(member, evInput())).rejects.toBeInstanceOf(ForbiddenError);
-    await expect(createEvent(admin, evInput())).rejects.toBeInstanceOf(ForbiddenError);
     expect(await db.event.count()).toBe(0);
+    await createEvent(admin, evInput());
+    expect(await db.event.count()).toBe(1);
   });
 
   it("copies a template chart when creating from a template", async () => {

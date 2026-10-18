@@ -147,7 +147,9 @@
     "codeTaken": "Det finns redan en kod med det namnet på eventet.",
     "crewWhen": "Välj minst en tidpunkt.",
     "urlInvalid": "Skriv en webbadress som börjar med http:// eller https://.",
-    "docDateInvalid": "Ange ett giltigt datum."
+    "docDateInvalid": "Ange ett giltigt datum.",
+    "scheduleEndBeforeStart": "Sluttiden måste vara efter starttiden.",
+    "scheduleTooLong": "Ett block får vara högst 24 timmar långt."
   },
   "messages": {
     "rateLimited": "För många försök. Vänta en stund och försök igen.",
@@ -245,7 +247,13 @@
     "docTooLarge": "Filen är för stor. Högst 15 MB.",
     "docFileRequired": "Välj en fil att ladda upp.",
     "newsSaved": "Nyheten är sparad.",
-    "newsDeleted": "Nyheten är borttagen."
+    "newsDeleted": "Nyheten är borttagen.",
+    "scheduleCategorySaved": "Kategorin är sparad.",
+    "scheduleCategoryDeleted": "Kategorin är borttagen. Blocken i den ligger kvar utan kategori.",
+    "scheduleCategoryDuplicate": "Det finns redan en kategori med det namnet.",
+    "scheduleItemSaved": "Blocket är sparat.",
+    "scheduleItemDeleted": "Blocket är borttaget.",
+    "scheduleBadCategory": "Kategorin hör inte till det här eventet."
   },
   "profile": {
     "title": "Min profil",
@@ -395,7 +403,8 @@
     "foodTitle": "Mat",
     "foodOrderBy": "beställ senast {when}",
     "ticketsHeading": "Biljetter",
-    "past": "Avslutat"
+    "past": "Avslutat",
+    "scheduleLink": "Visa schema"
   },
   "manage": {
     "title": "Hantera event",
@@ -427,7 +436,8 @@
     "faqLink": "Vanliga frågor",
     "sponsorsLink": "Sponsorer",
     "associationLink": "Föreningssidan",
-    "newsLink": "Nyheter"
+    "newsLink": "Nyheter",
+    "scheduleLink": "Schema"
   },
   "tickets": {
     "title": "Biljettyper",
@@ -1227,5 +1237,60 @@
     "statusLive": "Publicerad",
     "statusScheduled": "Schemalagd",
     "statusDraft": "Utkast"
+  },
+  "schedule": {
+    "title": "Schema",
+    "none": "Schemat är inte klart än.",
+    "legend": "Kategorier",
+    "noCategory": "Övrigt",
+    "showList": "Visa som lista",
+    "edit": "Redigera schemat",
+    "backToEvent": "Tillbaka till {event}",
+    "color_hay": "Gul",
+    "color_sage": "Grön",
+    "color_sky": "Blå",
+    "color_pink": "Rosa",
+    "color_orange": "Orange",
+    "color_barn": "Röd",
+    "color_teal": "Blågrön",
+    "color_plum": "Lila",
+    "color_night": "Mörkgrön",
+    "color_slate": "Grå"
+  },
+  "scheduleManage": {
+    "title": "Schema",
+    "lead": "Programmet för {event}: kategorier med färger och block med tider.",
+    "back": "Tillbaka till eventet",
+    "viewPage": "Visa det publika schemat",
+    "preview": "Så ser schemat ut",
+    "categories": "Kategorier",
+    "categoriesHint": "Varje block kan ha en kategori. Kategorin ger blocket dess färg, och namnet står också som text i blocket.",
+    "newCategory": "Lägg till en kategori",
+    "categoryName": "Namn",
+    "categoryNameEn": "Namn (engelska)",
+    "color": "Färg",
+    "addCategory": "Lägg till kategorin",
+    "saveCategory": "Spara kategorin",
+    "deleteCategory": "Ta bort kategorin",
+    "deleteCategoryConfirm": "Ta bort kategorin? Blocken i den ligger kvar utan kategori.",
+    "blocks": "block",
+    "items": "Block",
+    "newItem": "Lägg till ett block",
+    "noItems": "Inga block än.",
+    "itemTitle": "Rubrik",
+    "itemTitleEn": "Rubrik (engelska)",
+    "startsAt": "Start",
+    "endsAt": "Slut",
+    "category": "Kategori",
+    "noCategory": "Ingen kategori",
+    "location": "Plats",
+    "description": "Beskrivning",
+    "descriptionEn": "Beskrivning (engelska)",
+    "englishHint": "Engelska är valfritt. Lämnas det tomt visas den svenska texten.",
+    "addItem": "Lägg till blocket",
+    "saveItem": "Spara blocket",
+    "deleteItem": "Ta bort blocket",
+    "deleteItemConfirm": "Ta bort blocket?",
+    "edit": "Redigera"
   }
 }

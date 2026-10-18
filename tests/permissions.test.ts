@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ACTIONS, assertCan, can, ForbiddenError, UnauthenticatedError, type Action, type Actor } from "@/lib/permissions";
+import { ACTIONS, assertCan, can, effectiveTags, ForbiddenError, UnauthenticatedError, type Action, type Actor } from "@/lib/permissions";
 
 const verified = new Date();
 type Role = "visitor" | "unverified" | "member" | "festivalledare" | "ansvarig" | "admin" | "both";
@@ -25,28 +25,29 @@ const allow: Record<Action, Role[]> = {
   "ticket:buy": ["member", "ansvarig", "festivalledare", "admin", "both"],
   "food:buy": ["member", "ansvarig", "festivalledare", "admin", "both"],
   "seat:choose": ["member", "ansvarig", "festivalledare", "admin", "both"],
-  "order:view": ["festivalledare", "both"], // others only for their own (tested below)
-  "ticket:view": ["festivalledare", "both"],
-  "event:manage": ["festivalledare", "both"],
-  "ticketType:manage": ["festivalledare", "both"],
-  "chart:manage": ["festivalledare", "both"],
-  "template:manage": ["festivalledare", "both"],
-  "foodPackage:manage": ["festivalledare", "both"],
-  "discountCode:manage": ["festivalledare", "both"],
-  "attendees:view": ["festivalledare", "both"],
-  "sales:view": ["festivalledare", "both"],
-  "kitchen:view": ["festivalledare", "both"],
-  "checkin:perform": ["festivalledare", "both"],
-  "order:cancel": ["festivalledare", "both"],
-  "order:refund": ["festivalledare", "both"],
-  "broadcast:send": ["festivalledare", "both"],
+  "order:view": ["festivalledare", "admin", "both"], // others only for their own (tested below)
+  "ticket:view": ["festivalledare", "admin", "both"],
+  "event:manage": ["festivalledare", "admin", "both"],
+  "ticketType:manage": ["festivalledare", "admin", "both"],
+  "chart:manage": ["festivalledare", "admin", "both"],
+  "template:manage": ["festivalledare", "admin", "both"],
+  "foodPackage:manage": ["festivalledare", "admin", "both"],
+  "discountCode:manage": ["festivalledare", "admin", "both"],
+  "attendees:view": ["festivalledare", "admin", "both"],
+  "sales:view": ["festivalledare", "admin", "both"],
+  "kitchen:view": ["festivalledare", "admin", "both"],
+  "checkin:perform": ["festivalledare", "admin", "both"],
+  "order:cancel": ["festivalledare", "admin", "both"],
+  "order:refund": ["festivalledare", "admin", "both"],
+  "broadcast:send": ["festivalledare", "admin", "both"],
   "crewApplication:create": ["member", "ansvarig", "festivalledare", "admin", "both"],
-  "faq:manage": ["festivalledare", "both"],
-  "sponsor:manage": ["festivalledare", "both"],
-  "news:manage": ["festivalledare", "both"],
-  "association:manage": ["festivalledare", "both"],
-  "crewJob:create": ["festivalledare", "ansvarig", "both"],
-  "crewJob:edit": ["festivalledare", "both"], // Ansvarig only for their own jobs (tested below)
+  "faq:manage": ["festivalledare", "admin", "both"],
+  "sponsor:manage": ["festivalledare", "admin", "both"],
+  "news:manage": ["festivalledare", "admin", "both"],
+  "schedule:manage": ["festivalledare", "admin", "both"],
+  "association:manage": ["festivalledare", "admin", "both"],
+  "crewJob:create": ["festivalledare", "admin", "ansvarig", "both"],
+  "crewJob:edit": ["festivalledare", "admin", "both"], // Ansvarig only for their own jobs (tested below)
   "user:manage": ["admin", "both"],
   "userTag:manage": ["admin", "both"],
   "orgSettings:edit": ["admin", "both"],
@@ -71,6 +72,25 @@ describe("permission matrix (role × action)", () => {
   }
 });
 
+describe("Admin holds every right", () => {
+  it("an Admin without any other tag can do everything Festivalledare and Ansvarig can", () => {
+    const admin = actors.admin as Actor;
+    expect(effectiveTags(admin)).toEqual(expect.arrayContaining(["ADMIN", "FESTIVALLEDARE", "ANSVARIG"]));
+    for (const action of Object.keys(ACTIONS) as Action[]) {
+      const resource = ["profile:edit", "account:export", "account:delete"].includes(action) ? { ownerId: admin.id } : {};
+      expect(can(admin, action, resource), action).toBe(true);
+    }
+    expect(can(admin, "order:view", { ownerId: "someone-else" })).toBe(true);
+    expect(can(admin, "crewJob:edit", { ownerId: "someone-else" })).toBe(true);
+  });
+
+  it("effectiveTags leaves other people's tags alone", () => {
+    expect(effectiveTags({ tags: [] })).toEqual([]);
+    expect(effectiveTags({ tags: ["ANSVARIG"] })).toEqual(["ANSVARIG"]);
+    expect(effectiveTags({ tags: ["FESTIVALLEDARE"] })).toEqual(["FESTIVALLEDARE"]);
+  });
+});
+
 describe("crew job ownership", () => {
   const ansvarig = actors.ansvarig as Actor;
   const other = actors.member as Actor;
@@ -81,10 +101,10 @@ describe("crew job ownership", () => {
     expect(can(ansvarig, "crewJob:edit", {})).toBe(false);
   });
 
-  it("Festivalledare may manage every crew job; plain members and Admin may not", () => {
+  it("Festivalledare and Admin may manage every crew job; plain members may not", () => {
     expect(can(actors.festivalledare, "crewJob:edit", { ownerId: other.id })).toBe(true);
+    expect(can(actors.admin, "crewJob:edit", { ownerId: other.id })).toBe(true);
     expect(can(other, "crewJob:edit", { ownerId: other.id })).toBe(false);
-    expect(can(actors.admin, "crewJob:edit", { ownerId: other.id })).toBe(false);
   });
 
   it("Ansvarig gets no other management rights", () => {

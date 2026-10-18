@@ -612,12 +612,12 @@ describe("cancel & refund (Festivalledare)", () => {
     expect(provider.refunds).toHaveLength(0);
   });
 
-  it("only Festivalledare may cancel or refund; unpaid and unknown orders are rejected", async () => {
+  it("only Festivalledare (and Admin) may cancel or refund; unpaid and unknown orders are rejected", async () => {
     const s = await shop();
     const b = await buy(s);
     await expect(cancelOrder(b.actor, b.order.id, {})).rejects.toBeInstanceOf(ForbiddenError);
     const admin = actorOf({ ...(await makeUser({ tags: ["ADMIN"] })), tags: [{ tag: "ADMIN" }] });
-    await expect(cancelOrder(admin, b.order.id, {})).rejects.toBeInstanceOf(ForbiddenError);
+    expect(await cancelOrder(admin, b.order.id, {})).toEqual({ ok: false, reason: "notPaid" }); // allowed, but the order is still PENDING
     expect(await cancelOrder(s.fl, b.order.id, {})).toEqual({ ok: false, reason: "notPaid" }); // still PENDING
     expect(await cancelOrder(s.fl, "nope", {})).toEqual({ ok: false, reason: "notFound" });
   });

@@ -12,6 +12,7 @@ import { Link } from "@/i18n/navigation";
 import { PurchasePanel, type PanelFood, type PanelTicketType } from "@/components/purchase-panel";
 import { SeatMap } from "@/components/seat-map";
 import { getSeatMap } from "@/lib/seating/booking";
+import { countScheduleItems } from "@/lib/schedule/service";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -34,6 +35,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
   const now = new Date();
   const sold = await soldByType(event.id);
   const seatMap = event.chart ? await getSeatMap(event.id, user) : null;
+  const scheduleItems = await countScheduleItems(event.id);
   const packages = await listPackagesForSale(event.id, now);
   const isStaff = can(user, "event:manage");
   const dt = (d: Date) => f.dateTime(d, { dateStyle: "long", timeStyle: "short" });
@@ -108,6 +110,11 @@ export default async function EventPage({ params, searchParams }: { params: Prom
       <section aria-labelledby="about-h">
         <h2 id="about-h" className="text-xl font-semibold">{t("about")}</h2>
         <p className="mt-2 whitespace-pre-line">{event.description}</p>
+        {scheduleItems > 0 && (
+          <p className="mt-4">
+            <Link href={`/events/${event.slug}/schema`} className="btn-secondary">{t("scheduleLink")}</Link>
+          </p>
+        )}
       </section>
 
       {showPanel && (

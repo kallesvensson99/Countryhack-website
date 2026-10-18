@@ -82,7 +82,7 @@ describe("event statistics", () => {
     expect(st.revenue).toMatchObject({ chargedOre: 15000, refundedOre: 15000, netOre: 0 });
     expect(st.revenue.orders.refunded).toBe(1);
     await expect(getEventStats((await s.buyer()).actor, s.event.id)).rejects.toBeInstanceOf(ForbiddenError);
-    await expect(getEventStats(actorOf({ ...(await makeUser({ tags: ["ADMIN"] })), tags: [{ tag: "ADMIN" }] }), s.event.id)).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(getEventStats(actorOf({ ...(await makeUser({ tags: ["ADMIN"] })), tags: [{ tag: "ADMIN" }] }), s.event.id)).resolves.toBeDefined(); // an Admin holds every right
   });
 
   it("works for an event without a chart or sales", async () => {
@@ -176,17 +176,17 @@ describe("GET /api/events/[id]/attendees.csv", () => {
     return GET(new Request(`http://localhost/api/events/${eventId}/attendees.csv${query}`), { params: Promise.resolve({ id: eventId }) });
   }
 
-  it("401 for visitors, 403 for members and admins, 404 for unknown events", async () => {
+  it("401 for visitors, 403 for members, 200 for admins, 404 for unknown events", async () => {
     const s = await shop();
     expect((await get(s.event.id)).status).toBe(401);
     session.user = { ...(await s.buyer()).actor };
     expect((await get(s.event.id)).status).toBe(403);
     const admin = await makeUser({ tags: ["ADMIN"] });
     session.user = actorOf({ ...admin, tags: [{ tag: "ADMIN" }] });
-    expect((await get(s.event.id)).status).toBe(403);
+    expect((await get(s.event.id)).status).toBe(200); // an Admin holds every right
     session.user = s.fl;
     expect((await get("nope")).status).toBe(404);
-    expect(await db.auditLog.count({ where: { action: "attendees.export" } })).toBe(0);
+    expect(await db.auditLog.count({ where: { action: "attendees.export" } })).toBe(1); // only the Admin's allowed export; refusals leave no trace
   });
 
   it("returns a UTF-8 CSV download, honours filters and delimiter, and audits the export", async () => {
@@ -276,7 +276,7 @@ describe("email to attendees", () => {
     expect(await db.broadcast.count()).toBe(4);
 
     await expect(sendBroadcast((await s.buyer()).actor, s.event.id, input)).rejects.toBeInstanceOf(ForbiddenError);
-    await expect(sendBroadcast(actorOf({ ...(await makeUser({ tags: ["ADMIN"] })), tags: [{ tag: "ADMIN" }] }), s.event.id, input)).rejects.toBeInstanceOf(ForbiddenError);
+    await expect(sendBroadcast(actorOf({ ...(await makeUser({ tags: ["ADMIN"] })), tags: [{ tag: "ADMIN" }] }), s.event.id, input)).resolves.toBeDefined(); // an Admin holds every right
   });
 
   it("recipient list ignores anonymized accounts and duplicates", async () => {

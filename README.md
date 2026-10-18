@@ -30,7 +30,7 @@ All use the password **`Password123!`**.
 
 | Email | Role | Notes |
 |---|---|---|
-| `admin@ccss.test` | Admin | users, tags, org settings, audit log |
+| `admin@ccss.test` | Admin | users, tags, org settings, audit log, and every Festivalledare / Ansvarig right (events, crew, FAQ, news, sponsors, association page, schedule) |
 | `leader@ccss.test` | Festivalledare | manage events at `/sv/manage/events`, the FAQ at `/sv/manage/faq` and all crew jobs at `/sv/manage/crew` |
 | `ansvarig@ccss.test` | Ansvarig | post crew jobs and manage their own (and the applications to them) at `/sv/manage/crew` |
 | `member@ccss.test` | Member | adult, verified |
@@ -172,11 +172,12 @@ docker compose -f docker-compose.prod.yml exec -T db pg_restore -U ccss -d ccss 
 See the stage summary in the conversation; the short version:
 
 - **Sponsors**: Festivalledare add sponsor logos at `/sv/manage/sponsors` (tier *Huvudsponsor*, *Stor sponsor* or *Sponsor*, optional link, show/hide, order). They appear in the footer of every page, grouped by tier; the section is left out while there are none. Logos are PNG/JPG/WebP (max 5 MB) stored like event images.
+- **Event schedule** (block view): Festivalledare build a programme per event at *Hantera event → (event) → Schema* (`/sv/manage/events/<id>/schedule`): colour-coded **categories** (a name, optional English name and one of ten palette colours; each colour has a text colour that keeps it readable, and every block also names its category in text) and **blocks** with a title, start, end, place, category and description. The public page `/sv/events/<slug>/schema` shows one time grid per day with blocks placed by time (overlapping blocks stand side by side, blocks past midnight continue on the next day), a legend and a *Visa som lista* alternative. It follows the event's visibility, so a draft event's schedule is staff-only. Linked from the event page and the events list once there is a block.
 - **News** (`/sv/nyheter`, in the header): Festivalledare write posts at `/sv/manage/news` (Swedish, optional English, optional picture). A post is a *draft* until *Publicerad* is ticked; a publish time in the future schedules it. The three latest published posts are shown on the landing page and all of them (paged) under the News tab. Drafts and scheduled posts are visible to Festivalledare only (a visitor gets a 404). Links use a slug made from the headline when the post is created and never change.
 - **Association page** (`/sv/forening`, in the header): an editable intro (Swedish, optional English), the board members and uploaded documents such as meeting minutes. Festivalledare edit everything at `/sv/manage/association`. Each document is visible to *everyone*, to *logged-in users* or to *Festivalledare only*. Documents are PDF/Word/Excel/PowerPoint/OpenDocument (max 15 MB), stored in `uploads/documents` and handed out only through `/api/documents/<id>`, which checks who may see them; they are always downloaded as attachments. The bundled Caddyfile serves just `/uploads/events` and `/uploads/sponsors` directly, so documents never bypass that check.
 - **Seat is required**: a ticket type that includes a seat can only be bought together with a seat when the event has a seating chart (also free Crew tickets). Tickets without a seat and food-only orders are unaffected. The rule is enforced in `startCheckout` (the preview/price quote ignores it); `allowNoSeat` exists for tests only and is dropped by the server action's schema.
 - **Ansvarig** (tag) may post crew jobs and edit, close, delete and review applications for the jobs they posted themselves. Festivalledare manage every crew job and the FAQ. Applying needs a verified account (`/sv/crew/apply`); applications hold free text, so they are erased on account deletion and included in the data export.
-- Admin can view draft events but does **not** implicitly get Festivalledare's management rights (an admin can grant themselves the tag).
+- **Admin holds every right.** An admin is treated as also holding the Festivalledare and Ansvarig tags (`effectiveTags` in `src/lib/permissions`), whether or not those have been granted; the admin-only actions (users, roles, organisation settings, audit log) stay admin-only.
 - Email is not editable on the profile (avoids re-verification flows for now).
 - Registration says when an email/nickname is already taken (rate-limited per IP); password reset never reveals whether an account exists.
 - Locale is Swedish unless the visitor picks English — no `Accept-Language` redirect.

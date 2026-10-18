@@ -2,6 +2,7 @@ import { getFormatter, getTranslations, setRequestLocale } from "next-intl/serve
 import { Link } from "@/i18n/navigation";
 import { db } from "@/lib/db";
 import { listPublicEvents, saleState, seatAvailability, soldByType } from "@/lib/events/queries";
+import { countScheduleItems } from "@/lib/schedule/service";
 import { formatSek } from "@/lib/money";
 import { stockholmParts } from "@/lib/age";
 
@@ -22,6 +23,7 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
       ticketTypes: await db.ticketType.findMany({ where: { eventId: e.id, hidden: false }, orderBy: [{ sortOrder: "asc" }, { priceOre: "asc" }] }),
       sold: await soldByType(e.id),
       seats: await seatAvailability(e.id, now),
+      scheduleItems: await countScheduleItems(e.id),
     })),
   );
 
@@ -38,7 +40,7 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
         <p className="text-slate-600">{t("none")}</p>
       ) : (
         <ul className="space-y-10">
-          {details.map(({ event: e, ticketTypes, sold, seats }) => {
+          {details.map(({ event: e, ticketTypes, sold, seats, scheduleItems }) => {
             const over = e.endsAt <= now;
             const open = now >= e.registrationOpensAt && now < e.registrationClosesAt;
             const reg = now < e.registrationOpensAt ? th("registrationOpens", { when: when(e.registrationOpensAt) }) : open ? th("registrationOpen", { when: when(e.registrationClosesAt) }) : th("registrationClosed");
@@ -114,6 +116,7 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
                   )}
                   <div className="mt-auto flex flex-wrap gap-3 pt-2">
                     <Link href={`/events/${e.slug}`} className="btn">{!over && open ? th("heroCta") : t("more")}</Link>
+                    {scheduleItems > 0 && <Link href={`/events/${e.slug}/schema`} className="btn-secondary">{t("scheduleLink")}</Link>}
                   </div>
                 </div>
               </li>

@@ -14,14 +14,15 @@ const job = (over: Record<string, string> = {}) => crewJobSchema.parse({ title: 
 const faq = (over: Record<string, string> = {}) => faqItemSchema.parse({ group: "TICKETS", questionSv: "Fråga?", answerSv: "Svar.", ...over });
 
 describe("FAQ editing", () => {
-  it("only Festivalledare may edit; Ansvarig, members and Admin may not", async () => {
+  it("Festivalledare and Admin may edit; Ansvarig and members may not", async () => {
     const fl = asActor(await makeUser({ tags: ["FESTIVALLEDARE"] }));
     const ansvarig = asActor(await makeUser({ tags: ["ANSVARIG"] }));
     const admin = asActor(await makeUser({ tags: ["ADMIN"] }));
     const member = asActor(await makeUser());
     expect((await createFaqItem(fl, faq())).ok).toBe(true);
-    for (const who of [ansvarig, admin, member]) await expect(createFaqItem(who, faq())).rejects.toBeInstanceOf(ForbiddenError);
-    expect(await db.faqItem.count()).toBe(1);
+    expect((await createFaqItem(admin, faq())).ok).toBe(true); // an Admin holds every right
+    for (const who of [ansvarig, member]) await expect(createFaqItem(who, faq())).rejects.toBeInstanceOf(ForbiddenError);
+    expect(await db.faqItem.count()).toBe(2);
   });
 
   it("creates, updates, deletes and audits", async () => {
@@ -83,7 +84,7 @@ describe("FAQ editing", () => {
 });
 
 describe("crew jobs: who may post and edit", () => {
-  it("Festivalledare and Ansvarig may post; members and Admin may not", async () => {
+  it("Festivalledare, Ansvarig and Admin may post; members may not", async () => {
     const fl = asActor(await makeUser({ tags: ["FESTIVALLEDARE"] }));
     const ansvarig = asActor(await makeUser({ tags: ["ANSVARIG"] }));
     const member = asActor(await makeUser());
@@ -91,9 +92,9 @@ describe("crew jobs: who may post and edit", () => {
     expect((await createJob(fl, job())).ok).toBe(true);
     expect((await createJob(ansvarig, job())).ok).toBe(true);
     await expect(createJob(member, job())).rejects.toBeInstanceOf(ForbiddenError);
-    await expect(createJob(admin, job())).rejects.toBeInstanceOf(ForbiddenError);
+    expect((await createJob(admin, job())).ok).toBe(true);
     await expect(createJob(null as never, job())).rejects.toBeInstanceOf(UnauthenticatedError);
-    expect(await db.crewJob.count()).toBe(2);
+    expect(await db.crewJob.count()).toBe(3);
   });
 
   it("Ansvarig edits, closes and deletes only their own jobs; Festivalledare manage everything", async () => {

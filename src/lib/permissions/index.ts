@@ -10,8 +10,8 @@ import type { EventStatus, UserTagKind } from "@prisma/client";
  *  - FESTIVALLEDARE tag: all member abilities + all event management.
  *  - ANSVARIG tag: may post crew jobs and manage (edit, close, review applications for) their OWN jobs.
  *    Festivalledare manage all crew jobs and the FAQ.
- *  - ADMIN tag: user and org management; may also *view* draft events. Admin does
- *    NOT implicitly get event-management rights (grant the FESTIVALLEDARE tag for that).
+ *  - ADMIN tag: user and org management AND every other right: an admin is treated as holding the
+ *    FESTIVALLEDARE and ANSVARIG tags too (see effectiveTags), whether or not they have been granted.
  */
 
 export interface Actor {
@@ -57,6 +57,7 @@ export const ACTIONS = {
   "broadcast:send": "festivalledare",
   "faq:manage": "festivalledare",
   "sponsor:manage": "festivalledare",
+  "schedule:manage": "festivalledare", // the event programme: categories and blocks
   "news:manage": "festivalledare", // write, publish and delete news posts (drafts are visible to them too)
   "association:manage": "festivalledare", // intro, board members and documents on the association page
   // Crew jobs: Ansvarig may create and then manage their own; Festivalledare manage all
@@ -73,7 +74,12 @@ type Rule = "public" | "self" | "verifiedMember" | "ownerOrStaff" | "festivalled
 
 export type Action = keyof typeof ACTIONS;
 
-const has = (u: Actor, tag: UserTagKind) => u.tags.includes(tag);
+/** The tags that count when checking rights: an ADMIN also holds FESTIVALLEDARE and ANSVARIG. */
+export function effectiveTags(u: { tags: readonly UserTagKind[] }): readonly UserTagKind[] {
+  return u.tags.includes("ADMIN") ? [...new Set<UserTagKind>([...u.tags, "FESTIVALLEDARE", "ANSVARIG"])] : u.tags;
+}
+
+const has = (u: Actor, tag: UserTagKind) => effectiveTags(u).includes(tag);
 
 export function can(user: Actor | null, action: Action, resource: Resource = {}): boolean {
   const rule: Rule = ACTIONS[action];

@@ -138,13 +138,13 @@ model User {
   consents         Consent[]
   tickets          Ticket[]
   orders           Order[]
-  reservedSeats    Seat[]           @relation("SeatReservedFor")
-  eventsCreated    Event[]          @relation("EventCreatedBy")
-  checkedInTickets Ticket[]         @relation("TicketCheckedInBy")
-  cancelledOrders  Order[]          @relation("OrderCancelledBy")
+  reservedSeats    Seat[]            @relation("SeatReservedFor")
+  eventsCreated    Event[]           @relation("EventCreatedBy")
+  checkedInTickets Ticket[]          @relation("TicketCheckedInBy")
+  cancelledOrders  Order[]           @relation("OrderCancelledBy")
   collectedMeals   MealCollection[]
   broadcastsSent   Broadcast[]
-  tagsGranted      UserTag[]        @relation("TagGrantedBy")
+  tagsGranted      UserTag[]         @relation("TagGrantedBy")
   auditLogs        AuditLog[]
   crewJobsCreated  CrewJob[]
   crewApplications CrewApplication[]
@@ -276,15 +276,17 @@ model Event {
   createdAt            DateTime    @default(now())
   updatedAt            DateTime    @updatedAt
 
-  createdBy     User           @relation("EventCreatedBy", fields: [createdById], references: [id])
-  ticketTypes   TicketType[]
-  tickets       Ticket[]
-  chart         SeatingChart?
-  meals         Meal[]
-  foodPackages  FoodPackage[]
-  orders        Order[]
-  discountCodes DiscountCode[]
-  broadcasts    Broadcast[]
+  createdBy          User               @relation("EventCreatedBy", fields: [createdById], references: [id])
+  ticketTypes        TicketType[]
+  tickets            Ticket[]
+  chart              SeatingChart?
+  meals              Meal[]
+  foodPackages       FoodPackage[]
+  orders             Order[]
+  discountCodes      DiscountCode[]
+  scheduleCategories ScheduleCategory[]
+  scheduleItems      ScheduleItem[]
+  broadcasts         Broadcast[]
 }
 
 model TicketType {
@@ -815,17 +817,56 @@ model BoardMember {
 /// A news post. Visible to everyone when `publishedAt` is set and not in the future; otherwise a draft
 /// (or scheduled) that only Festivalledare can see. English text is optional (empty = fall back to Swedish).
 model NewsPost {
-  id            String    @id @default(cuid())
-  slug          String    @unique
-  title         String
-  titleEn       String    @default("")
-  body          String
-  bodyEn        String    @default("")
-  imagePath     String? // "/uploads/news/<hex>.<ext>"
-  publishedAt   DateTime?
-  createdById   String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  titleEn     String    @default("")
+  body        String
+  bodyEn      String    @default("")
+  imagePath   String? // "/uploads/news/<hex>.<ext>"
+  publishedAt DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([publishedAt])
+}
+
+/// A colour-coded category of programme items for one event ("Turnering", "Mat" ...). `color` is a key of the
+/// fixed palette in src/lib/schedule/palette.ts (each key has a text colour that keeps the contrast readable).
+model ScheduleCategory {
+  id        String   @id @default(cuid())
+  eventId   String
+  name      String
+  nameEn    String   @default("")
+  color     String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  items ScheduleItem[]
+
+  @@unique([eventId, name])
+}
+
+/// One block in the event's programme.
+model ScheduleItem {
+  id            String   @id @default(cuid())
+  eventId       String
+  categoryId    String?
+  title         String
+  titleEn       String   @default("")
+  description   String   @default("")
+  descriptionEn String   @default("")
+  location      String   @default("")
+  startsAt      DateTime
+  endsAt        DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  event    Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  category ScheduleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([eventId, startsAt])
 }

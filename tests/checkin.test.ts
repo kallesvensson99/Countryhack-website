@@ -84,11 +84,12 @@ describe("looking up a ticket from its QR code", () => {
     expect((await lookupByToken(crew, s.event.id, token(paid.ticket))).ok).toBe(true); // closed for sales, but the party goes on
   });
 
-  it("is for Festivalledare only", async () => {
+  it("is for Festivalledare and Admin only", async () => {
     const { s, maja } = await setup();
     const member = actorOf({ ...(await makeUser()), tags: [] });
     const admin = actorOf({ ...(await makeUser({ tags: ["ADMIN"] })), tags: [{ tag: "ADMIN" }] });
-    for (const who of [member, admin]) {
+    expect((await lookupByToken(admin, s.event.id, token(maja.ticket))).ok).toBe(true); // an Admin holds every right
+    for (const who of [member]) {
       await expect(lookupByToken(who, s.event.id, token(maja.ticket))).rejects.toBeInstanceOf(ForbiddenError);
       await expect(searchAttendees(who, s.event.id, "maja")).rejects.toBeInstanceOf(ForbiddenError);
       await expect(checkIn(who, s.event.id, maja.ticket.id)).rejects.toBeInstanceOf(ForbiddenError);

@@ -30,14 +30,15 @@ beforeEach(async () => {
 });
 
 describe("sponsors", () => {
-  it("only Festivalledare manage sponsors", async () => {
+  it("Festivalledare and Admin manage sponsors; Ansvarig and members do not", async () => {
     const fl = asActor(await makeUser({ tags: ["FESTIVALLEDARE"] }));
     expect((await createSponsor(fl, input(), png)).ok).toBe(true);
-    for (const tags of [["ANSVARIG"], ["ADMIN"], []] as const) {
+    expect((await createSponsor(asActor(await makeUser({ tags: ["ADMIN"] })), input(), png)).ok).toBe(true);
+    for (const tags of [["ANSVARIG"], []] as const) {
       const who = asActor(await makeUser({ tags: [...tags] }));
       await expect(createSponsor(who, input(), png)).rejects.toBeInstanceOf(ForbiddenError);
     }
-    expect(await db.sponsor.count()).toBe(1);
+    expect(await db.sponsor.count()).toBe(2);
   });
 
   it("stores the logo, audits, and replaces or removes the file when the sponsor changes", async () => {

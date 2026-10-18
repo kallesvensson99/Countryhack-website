@@ -112,7 +112,7 @@ test.describe("check-in at the door", () => {
     await expect(page.getByRole("heading", { name: "Maja Medlem" })).toHaveCount(0);
   });
 
-  test("unpaid, refunded and unknown people can't be checked in; members and admins can't open the page", async ({ page }) => {
+  test("unpaid, refunded and unknown people can't be checked in; members can't open the page", async ({ page }) => {
     await makeAttendee("member@ccss.test");
     await db.ticket.updateMany({ where: { user: { email: "member@ccss.test" }, event: { slug: SLUG } }, data: { status: "CANCELLED" } });
     await openCheckin(page);
@@ -120,14 +120,12 @@ test.describe("check-in at the door", () => {
     await expect(page.getByText("Ingen träff.")).toBeVisible();
 
     const event = await db.event.findUniqueOrThrow({ where: { slug: SLUG } });
-    for (const email of ["member@ccss.test", "admin@ccss.test"]) {
-      await login(page, email);
-      for (const p of ["checkin", "attendees", "stats", "broadcast"]) {
-        await page.goto(`/sv/manage/events/${event.id}/${p}`);
-        await expect(page.getByText("Sidan hittades inte.")).toBeVisible();
-      }
-      expect((await page.request.get(`/api/events/${event.id}/attendees.csv`)).status()).toBe(403);
+    await login(page, "member@ccss.test");
+    for (const p of ["checkin", "attendees", "stats", "broadcast"]) {
+      await page.goto(`/sv/manage/events/${event.id}/${p}`);
+      await expect(page.getByText("Sidan hittades inte.")).toBeVisible();
     }
+    expect((await page.request.get(`/api/events/${event.id}/attendees.csv`)).status()).toBe(403);
   });
 
   test("the door tool fits a phone", async ({ page }) => {

@@ -147,7 +147,9 @@
     "codeTaken": "A code with that name already exists for this event.",
     "crewWhen": "Pick at least one time.",
     "urlInvalid": "Enter a web address starting with http:// or https://.",
-    "docDateInvalid": "Enter a valid date."
+    "docDateInvalid": "Enter a valid date.",
+    "scheduleEndBeforeStart": "The end must be after the start.",
+    "scheduleTooLong": "A block can be 24 hours long at most."
   },
   "messages": {
     "rateLimited": "Too many attempts. Please wait a while and try again.",
@@ -245,7 +247,13 @@
     "docTooLarge": "The file is too large. 15 MB at most.",
     "docFileRequired": "Choose a file to upload.",
     "newsSaved": "The news post is saved.",
-    "newsDeleted": "The news post is deleted."
+    "newsDeleted": "The news post is deleted.",
+    "scheduleCategorySaved": "The category is saved.",
+    "scheduleCategoryDeleted": "The category is deleted. Its blocks stay, without a category.",
+    "scheduleCategoryDuplicate": "A category with that name already exists.",
+    "scheduleItemSaved": "The block is saved.",
+    "scheduleItemDeleted": "The block is deleted.",
+    "scheduleBadCategory": "The category does not belong to this event."
   },
   "profile": {
     "title": "My profile",
@@ -395,7 +403,8 @@
     "foodTitle": "Food",
     "foodOrderBy": "order by {when}",
     "ticketsHeading": "Tickets",
-    "past": "Ended"
+    "past": "Ended",
+    "scheduleLink": "View schedule"
   },
   "manage": {
     "title": "Manage events",
@@ -427,7 +436,8 @@
     "faqLink": "FAQ",
     "sponsorsLink": "Sponsors",
     "associationLink": "Association page",
-    "newsLink": "News"
+    "newsLink": "News",
+    "scheduleLink": "Schedule"
   },
   "tickets": {
     "title": "Ticket types",
@@ -1227,5 +1237,60 @@
     "statusLive": "Published",
     "statusScheduled": "Scheduled",
     "statusDraft": "Draft"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "none": "The schedule is not ready yet.",
+    "legend": "Categories",
+    "noCategory": "Other",
+    "showList": "Show as a list",
+    "edit": "Edit the schedule",
+    "backToEvent": "Back to {event}",
+    "color_hay": "Yellow",
+    "color_sage": "Green",
+    "color_sky": "Blue",
+    "color_pink": "Pink",
+    "color_orange": "Orange",
+    "color_barn": "Red",
+    "color_teal": "Teal",
+    "color_plum": "Purple",
+    "color_night": "Dark green",
+    "color_slate": "Grey"
+  },
+  "scheduleManage": {
+    "title": "Schedule",
+    "lead": "The programme for {event}: categories with colours and blocks with times.",
+    "back": "Back to the event",
+    "viewPage": "View the public schedule",
+    "preview": "How the schedule looks",
+    "categories": "Categories",
+    "categoriesHint": "Every block can have a category. The category gives the block its colour, and its name is also written as text in the block.",
+    "newCategory": "Add a category",
+    "categoryName": "Name",
+    "categoryNameEn": "Name (English)",
+    "color": "Colour",
+    "addCategory": "Add category",
+    "saveCategory": "Save category",
+    "deleteCategory": "Delete category",
+    "deleteCategoryConfirm": "Delete the category? Its blocks stay, without a category.",
+    "blocks": "blocks",
+    "items": "Blocks",
+    "newItem": "Add a block",
+    "noItems": "No blocks yet.",
+    "itemTitle": "Title",
+    "itemTitleEn": "Title (English)",
+    "startsAt": "Start",
+    "endsAt": "End",
+    "category": "Category",
+    "noCategory": "No category",
+    "location": "Place",
+    "description": "Description",
+    "descriptionEn": "Description (English)",
+    "englishHint": "English is optional. If left empty, the Swedish text is shown.",
+    "addItem": "Add block",
+    "saveItem": "Save block",
+    "deleteItem": "Delete block",
+    "deleteItemConfirm": "Delete the block?",
+    "edit": "Edit"
   }
 }

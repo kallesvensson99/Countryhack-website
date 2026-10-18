@@ -32,15 +32,16 @@ beforeEach(async () => {
 const leader = async () => asActor(await makeUser({ tags: ["FESTIVALLEDARE"] }));
 
 describe("who may write news", () => {
-  it("only Festivalledare", async () => {
+  it("Festivalledare and Admin; not Ansvarig or members", async () => {
     const fl = await leader();
     expect((await createPost(fl, post(), undefined, null, NOW)).ok).toBe(true);
-    for (const tags of [["ANSVARIG"], ["ADMIN"], []] as const) {
+    expect((await createPost(asActor(await makeUser({ tags: ["ADMIN"] })), post(), undefined, null, NOW)).ok).toBe(true);
+    for (const tags of [["ANSVARIG"], []] as const) {
       const who = asActor(await makeUser({ tags: [...tags] }));
       await expect(createPost(who, post())).rejects.toBeInstanceOf(ForbiddenError);
       await expect(listAllNews(who)).rejects.toBeInstanceOf(ForbiddenError);
     }
-    expect(await db.newsPost.count()).toBe(1);
+    expect(await db.newsPost.count()).toBe(2);
   });
 });
 

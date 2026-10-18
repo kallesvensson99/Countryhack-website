@@ -1,13 +1,13 @@
 import { db } from "../db";
 import { writeAudit } from "../audit";
-import { assertCan, can, type Actor } from "../permissions";
+import { assertCan, can, effectiveTags, type Actor } from "../permissions";
 import { claimSeat, moveClaim, type ClaimError } from "./claims";
 import type { MapSeat, SeatMapData, SeatState } from "./types";
 
 export type ChooseSeatError = ClaimError | "forbidden" | "deadlinePassed" | "eventNotOpen";
 export type ChooseSeatResult = { ok: true; seatId: string; moved: boolean } | { ok: false; reason: ChooseSeatError };
 
-const isStaff = (a: Actor) => a.tags.includes("FESTIVALLEDARE");
+const isStaff = (a: Actor) => effectiveTags(a).includes("FESTIVALLEDARE");
 
 /**
  * A member chooses (or changes) the seat for one of their tickets.

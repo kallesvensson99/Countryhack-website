@@ -9,6 +9,7 @@ import { logoutAction } from "@/actions/auth";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { SponsorsFooter } from "@/components/sponsors-footer";
 import { getOrgSettings } from "@/lib/auth/service";
+import { effectiveTags } from "@/lib/permissions";
 import "../globals.css";
 
 // The header shows the logged-in user and the footer reads org settings, so never prerender.
@@ -27,8 +28,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
 
   const [messages, t, user, org] = await Promise.all([getMessages(), getTranslations("nav"), getCurrentUser(), getOrgSettings()]);
   const isAdmin = user?.tags.includes("ADMIN");
-  const isLeader = user?.tags.includes("FESTIVALLEDARE");
-  const isCrewStaff = isLeader || user?.tags.includes("ANSVARIG");
+  const tags = user ? effectiveTags(user) : [];
+  const isLeader = tags.includes("FESTIVALLEDARE"); // an admin counts as one
+  const isCrewStaff = isLeader || tags.includes("ANSVARIG");
 
   return (
     // suppressHydrationWarning: browser extensions (e.g. LanguageTool) add attributes to <html> before React hydrates.

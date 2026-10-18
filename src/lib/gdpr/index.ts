@@ -22,6 +22,8 @@ export async function exportUserData(userId: string) {
       orders: { include: { items: true, payments: { select: { provider: true, kind: true, amountOre: true, status: true, createdAt: true } } } },
       reservedSeats: { select: { label: true } },
       crewApplications: { include: { job: { select: { title: true } } } },
+      teamMemberships: { include: { team: { select: { name: true, captainId: true } } } },
+      tournamentPlays: { include: { tournament: { select: { name: true } } } },
     },
   });
   const { passwordHash: _passwordHash, ...profile } = user;
@@ -83,6 +85,14 @@ export async function anonymizeUser(
     await tx.authToken.deleteMany({ where: { userId } });
     await tx.userTag.deleteMany({ where: { userId } });
     await tx.crewApplication.deleteMany({ where: { userId } }); // free-text motivation is personal data
+    // Teams: the captaincy passes to the longest-standing other member; a team with nobody else is deleted.
+    for (const team of await tx.team.findMany({ where: { captainId: userId }, include: { members: { where: { userId: { not: userId } }, orderBy: { joinedAt: "asc" }, take: 1 } } })) {
+      if (team.members[0]) await tx.team.update({ where: { id: team.id }, data: { captainId: team.members[0].userId } });
+      else await tx.team.delete({ where: { id: team.id } });
+    }
+    await tx.tournamentPlayer.deleteMany({ where: { userId } });
+    await tx.teamMember.deleteMany({ where: { userId } });
+    await tx.teamInvite.deleteMany({ where: { OR: [{ userId }, { invitedById: userId }] } });
     await tx.consent.updateMany({ where: { userId }, data: { ip: null } });
     await tx.seat.updateMany({ where: { reservedForUserId: userId }, data: { reservedForUserId: null } });
     await tx.foodPurchase.updateMany({ where: { ticket: { userId } }, data: { allergiesSnapshot: null } });

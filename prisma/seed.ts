@@ -34,6 +34,27 @@ async function main() {
   // a contact address so the FAQ and crew pages have something to show in development
   if (!settings.contactEmail) await db.orgSettings.update({ where: { id: settings.id }, data: { contactEmail: "info@ccss.test" } });
 
+  // one tournament at the example event, so teams and tournaments can be tried out in development
+  const exampleEvent = await db.event.findFirst({ where: { status: "PUBLISHED" }, orderBy: { startsAt: "asc" } });
+  if (exampleEvent && (await db.tournament.count()) === 0) {
+    await db.tournament.create({
+      data: {
+        slug: "counter-strike-2-turnering",
+        name: "Counter-Strike 2-turnering",
+        game: "Counter-Strike 2",
+        description: "Lagturnering på Countryhack. Anmäl ditt lag, välj vilka som spelar och dyk upp i tid.",
+        format: "Enkel utslagning, bäst av 3",
+        teamSize: 2,
+        maxSubstitutes: 1,
+        maxTeams: 16,
+        registrationClosesAt: new Date(exampleEvent.startsAt.getTime() - 3600_000),
+        startsAt: exampleEvent.startsAt,
+        eventId: exampleEvent.id,
+        status: "PUBLISHED",
+      },
+    });
+  }
+
   // one news post so the news section is visible in development (editable in the app)
   if ((await db.newsPost.count()) === 0) {
     await db.newsPost.create({

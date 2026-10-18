@@ -13,6 +13,7 @@ import { PurchasePanel, type PanelFood, type PanelTicketType } from "@/component
 import { SeatMap } from "@/components/seat-map";
 import { getSeatMap } from "@/lib/seating/booking";
 import { countScheduleItems } from "@/lib/schedule/service";
+import { tournamentsForEvent } from "@/lib/tournaments/service";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -36,6 +37,7 @@ export default async function EventPage({ params, searchParams }: { params: Prom
   const sold = await soldByType(event.id);
   const seatMap = event.chart ? await getSeatMap(event.id, user) : null;
   const scheduleItems = await countScheduleItems(event.id);
+  const eventTournaments = await tournamentsForEvent(event.id);
   const packages = await listPackagesForSale(event.id, now);
   const isStaff = can(user, "event:manage");
   const dt = (d: Date) => f.dateTime(d, { dateStyle: "long", timeStyle: "short" });
@@ -110,6 +112,18 @@ export default async function EventPage({ params, searchParams }: { params: Prom
       <section aria-labelledby="about-h">
         <h2 id="about-h" className="text-xl font-semibold">{t("about")}</h2>
         <p className="mt-2 whitespace-pre-line">{event.description}</p>
+        {eventTournaments.length > 0 && (
+          <div className="mt-4">
+            <h3 className="font-semibold">{t("tournamentsTitle")}</h3>
+            <ul className="mt-1 list-disc pl-5">
+              {eventTournaments.map((x) => (
+                <li key={x.id}>
+                  <Link href={`/turneringar/${x.slug}`} className="link font-bold">{x.name}</Link> <span className="text-slate-600">· {x.game}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {scheduleItems > 0 && (
           <p className="mt-4">
             <Link href={`/events/${event.slug}/schema`} className="btn-secondary">{t("scheduleLink")}</Link>

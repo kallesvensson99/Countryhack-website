@@ -45,6 +45,9 @@ const allow: Record<Action, Role[]> = {
   "sponsor:manage": ["festivalledare", "admin", "both"],
   "news:manage": ["festivalledare", "admin", "both"],
   "schedule:manage": ["festivalledare", "admin", "both"],
+  "team:create": ["member", "ansvarig", "festivalledare", "admin", "both"],
+  "team:moderate": ["festivalledare", "admin", "both"],
+  "tournament:manage": ["festivalledare", "admin", "both"],
   "association:manage": ["festivalledare", "admin", "both"],
   "crewJob:create": ["festivalledare", "admin", "ansvarig", "both"],
   "crewJob:edit": ["festivalledare", "admin", "both"], // Ansvarig only for their own jobs (tested below)

@@ -57,6 +57,9 @@ export const ACTIONS = {
   "broadcast:send": "festivalledare",
   "faq:manage": "festivalledare",
   "sponsor:manage": "festivalledare",
+  "team:create": "verifiedMember", // create a team (the creator becomes its captain); captain actions are checked per team in the service
+  "team:moderate": "festivalledare", // disband any team, remove any registration
+  "tournament:manage": "festivalledare",
   "schedule:manage": "festivalledare", // the event programme: categories and blocks
   "news:manage": "festivalledare", // write, publish and delete news posts (drafts are visible to them too)
   "association:manage": "festivalledare", // intro, board members and documents on the association page

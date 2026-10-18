@@ -138,14 +138,19 @@ model User {
   consents         Consent[]
   tickets          Ticket[]
   orders           Order[]
-  reservedSeats    Seat[]            @relation("SeatReservedFor")
-  eventsCreated    Event[]           @relation("EventCreatedBy")
-  checkedInTickets Ticket[]          @relation("TicketCheckedInBy")
-  cancelledOrders  Order[]           @relation("OrderCancelledBy")
+  reservedSeats    Seat[]             @relation("SeatReservedFor")
+  eventsCreated    Event[]            @relation("EventCreatedBy")
+  checkedInTickets Ticket[]           @relation("TicketCheckedInBy")
+  cancelledOrders  Order[]            @relation("OrderCancelledBy")
   collectedMeals   MealCollection[]
   broadcastsSent   Broadcast[]
-  tagsGranted      UserTag[]         @relation("TagGrantedBy")
+  tagsGranted      UserTag[]          @relation("TagGrantedBy")
   auditLogs        AuditLog[]
+  teamsCaptained   Team[]             @relation("TeamCaptain")
+  teamMemberships  TeamMember[]
+  teamInvitesGot   TeamInvite[]       @relation("InviteTo")
+  teamInvitesSent  TeamInvite[]       @relation("InviteBy")
+  tournamentPlays  TournamentPlayer[]
   crewJobsCreated  CrewJob[]
   crewApplications CrewApplication[]
 }
@@ -285,6 +290,7 @@ model Event {
   orders             Order[]
   discountCodes      DiscountCode[]
   scheduleCategories ScheduleCategory[]
+  tournaments        Tournament[]
   scheduleItems      ScheduleItem[]
   broadcasts         Broadcast[]
 }
@@ -869,4 +875,115 @@ model ScheduleItem {
   category ScheduleCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@index([eventId, startsAt])
+}
+
+// ───────────────────────── Teams and tournaments ─────────────────────────
+
+enum TournamentStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+/// A team (lag). Not tied to an event: it can enter tournaments at any event. The creator is the captain.
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  nameKey     String   @unique // lower-cased, whitespace-collapsed name: names are unique ignoring case
+  tag         String   @default("") // short tag, e.g. "CCK"
+  description String   @default("")
+  captainId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  captain       User                     @relation("TeamCaptain", fields: [captainId], references: [id])
+  members       TeamMember[]
+  invites       TeamInvite[]
+  registrations TournamentRegistration[]
+
+  @@index([captainId])
+}
+
+model TeamMember {
+  teamId   String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+  @@index([userId])
+}
+
+/// The captain invites a user by nickname; the user accepts or declines.
+model TeamInvite {
+  id          String   @id @default(cuid())
+  teamId      String
+  userId      String // the invited user
+  invitedById String
+  createdAt   DateTime @default(now())
+
+  team      Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User @relation("InviteTo", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User @relation("InviteBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+/// A tournament (turnering), created by Festivalledare. Optionally played at an event.
+model Tournament {
+  id                   String           @id @default(cuid())
+  slug                 String           @unique
+  name                 String
+  game                 String
+  description          String           @default("")
+  format               String           @default("") // free text: "Enkel utslagning, bäst av 3" ...
+  teamSize             Int // players per team
+  maxSubstitutes       Int              @default(1) // extra players a roster may hold
+  maxTeams             Int? // null = no limit
+  registrationClosesAt DateTime
+  startsAt             DateTime?
+  eventId              String?
+  status               TournamentStatus @default(DRAFT)
+  createdById          String?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  event         Event?                   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  registrations TournamentRegistration[]
+  players       TournamentPlayer[]
+
+  @@index([status, startsAt])
+}
+
+/// A team entered in a tournament, with the roster of players the captain picked.
+model TournamentRegistration {
+  id             String   @id @default(cuid())
+  tournamentId   String
+  teamId         String
+  registeredById String
+  createdAt      DateTime @default(now())
+
+  tournament Tournament         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  team       Team               @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  roster     TournamentPlayer[]
+
+  @@unique([tournamentId, teamId])
+}
+
+/// One player on a registration's roster. `tournamentId` is repeated so that a person can play for only ONE team per tournament.
+model TournamentPlayer {
+  id             String @id @default(cuid())
+  registrationId String
+  tournamentId   String
+  userId         String
+
+  registration TournamentRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  tournament   Tournament             @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user         User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tournamentId, userId])
+  @@index([registrationId])
 }

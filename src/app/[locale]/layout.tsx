@@ -53,6 +53,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
               </Link>
               <nav aria-label={t("main")} className="flex flex-wrap items-center gap-x-5 gap-y-2 text-base font-bold [&_a:not(.btn)]:inline-flex [&_a:not(.btn)]:min-h-11 [&_a:not(.btn)]:items-center [&_button]:min-h-11">
                 <Link href="/events" className="hover:underline">{t("events")}</Link>
+                <Link href="/turneringar" className="hover:underline">{t("tournaments")}</Link>
+                <Link href="/lag" className="hover:underline">{t("teams")}</Link>
                 <Link href="/nyheter" className="hover:underline">{t("news")}</Link>
                 <Link href="/forening" className="hover:underline">{t("association")}</Link>
                 <Link href="/faq" className="hover:underline">{t("faq")}</Link>
